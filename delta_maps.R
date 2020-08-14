@@ -12,7 +12,7 @@ options(digits = 6)
 
 
 # Get shapefiles
-us <- 
+us <-  getData("GADM", country="USA", path= "Data", level=1)
 ar
 ear
 
