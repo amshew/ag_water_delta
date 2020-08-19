@@ -99,52 +99,52 @@ AR
 
 
 cropdata<-c()
-#**I tried to use lapply after starking the rasters but didn't work***#
-for (i in 1:10){
-  print(i)
+####----downloadlanduse***#
+Dipo2<-function(AR,i,b){
   
-  cropdata[[i]]<-freq(AR[[i]])%>% 
-    #--- matrix to data.frame ---#
-    data.frame(.) %>% 
-    #--- find acreage ---#
-    #---0.222394 is the conversion factor---#
-    mutate(Acreage = count*0.222394)%>%
-    #--- code ---#
-    left_join(CDL_code, by=c("value" = "value")) %>%
-    #--- keep only the share of rice and soy ---#
-    filter(value %in% c(1, 3, 5), )  %>%
-    subset( .,select=c( Crop, Acreage))%>%
-    #--- long to wide ---#
-    spread(Crop,Acreage)  %>%
-    #---year--#
-    mutate(year =i) 
+  for(i in 1:b){
+    print(i)
+    
+    cropdata[[i]]<-freq(AR[[i]])%>% 
+      #--- matrix to data.frame ---#
+      data.frame(.) %>% 
+      #--- find acreage ---#
+      #---0.222394 is the conversion factor---#
+      mutate(Acreage = count*0.222394)%>%
+      #--- code ---#
+      left_join(CDL_code, by=c("value" = "value")) %>%
+      #--- keep only the share of rice and soy ---#
+      filter(value %in% c(1, 3, 5), )  %>%
+      subset( .,select=c( Crop, Acreage))%>%
+      #--- long to wide ---#
+      spread(Crop,Acreage)  %>%
+      #---year--#
+      mutate(year =2009+i) 
+  }
+  saveRDS(cropdata, file="C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/output.rds")
+  cropdata<-readRDS("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/output.rds")
+  Acreage<- do.call(rbind, cropdata)
   
+  saveRDS(Acreage, file="C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Acreage.rds")
+  return(Acreage)
 }
-saveRDS(cropdata, file="C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/output.rds")
-cropdata<-readRDS("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/output.rds")
 
-(Acreage<- do.call(rbind, cropdata)%>%
-    rename(id = year) %>%
-  
-left_join(duration, by=c("id" = "id"))
-  )
-saveRDS(Acreage, file="C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Acreage.rds")
-
-
-gather(Acreage,key="crop", value="Acreage", Corn,Soybeans,Rice)%>%
+Acres<-Dipo2(AR,1,2)
+Acres
+gather(Acres,key="crop", value="Acreage", Corn,Soybeans,Rice)%>%
   mutate(Acreage=Acreage/1000)%>%
   ggplot(aes(year,Acreage, color = crop))+
   geom_line()+
   geom_point() +
   theme_bw() +
-
+  
   labs(y = "Acreage (,000 Acres.) ",
        x = "Years",
        colour = "")+
-
+  
   scale_y_continuous(labels = scales::comma)+
   scale_x_continuous(breaks=seq(2010,2019,1),limits = c(2010,2019))+
-
+  
   
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   guides(colour=guide_legend(ncol=1))+
@@ -162,40 +162,40 @@ gather(Acreage,key="crop", value="Acreage", Corn,Soybeans,Rice)%>%
 Share_irr_soy<- data.frame(Share_irr_soy=c(0.736050157,	0.788888889,0.790625,	0.819571865,	0.817337461,	0.846875,	0.814376997,	0.842492918,0.830275229,0.84
 ),year=c(2010,2011,2012,2013,2014,2015,2016,2017,2018,2019))
 Share_irr_soy
- (Acreage_irr<- left_join(Acreage,Share_irr_soy, by=c("year" = "year")) %>%
-   mutate(irrigated_soybean =Soybeans*Share_irr_soy)  %>%
-   dplyr::select(c(year,Corn,Soybeans,irrigated_soybean,Rice) )  %>%
- gather(key="crop", value="Acreage", Corn,Soybeans,irrigated_soybean,Rice) %>%
-   mutate(Acreage=Acreage/1000) %>%
+(Acreage_irr<- left_join(Acres,Share_irr_soy, by=c("year" = "year")) %>%
+    mutate(irrigated_soybean =Soybeans*Share_irr_soy)  %>%
+    dplyr::select(c(year,Corn,Soybeans,irrigated_soybean,Rice) )  %>%
+    gather(key="crop", value="Acreage", Corn,Soybeans,irrigated_soybean,Rice) %>%
+    mutate(Acreage=Acreage/1000) %>%
     ggplot(aes(year,Acreage, color = crop))+
-   geom_line()+
-   geom_point() +
-   theme_bw() +
-   
-   labs(y = "Acreage (,000 Acres.) ",
-        x = "Years",
-        colour = "")+
-   
-   scale_y_continuous(breaks=seq(1000,4500,500),labels = scales::comma)+
-   scale_x_continuous(breaks=seq(2010,2019,1),limits = c(2010,2019))+
-   
-   
-   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-   guides(colour=guide_legend(ncol=1))+
-   theme(legend.justification = c(0, 1), 
-         legend.position = "right",
-         legend.box.margin=margin(c(0,10,0,10)))+
-   theme(legend.text=element_text(size=rel(0.9)))+
-   theme(legend.key.size = unit(1.5,"line"))+
-   theme(axis.title  = element_text(size = 11))+
-   theme(axis.text = element_text(size = 11))+
-     scale_color_manual(name="Acreage",
-                        labels=c("Corn","Irrigated Soybeans","Total Soybean acreage", 'Rice'),
-                        values=c("red","green","blue", "purple")                        )
- )
+    geom_line()+
+    geom_point() +
+    theme_bw() +
+    
+    labs(y = "Acreage (,000 Acres.) ",
+         x = "Years",
+         colour = "")+
+    
+    scale_y_continuous(breaks=seq(1000,4500,500),labels = scales::comma)+
+    scale_x_continuous(breaks=seq(2010,2019,1),limits = c(2010,2019))+
+    
+    
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+    guides(colour=guide_legend(ncol=1))+
+    theme(legend.justification = c(0, 1), 
+          legend.position = "right",
+          legend.box.margin=margin(c(0,10,0,10)))+
+    theme(legend.text=element_text(size=rel(0.9)))+
+    theme(legend.key.size = unit(1.5,"line"))+
+    theme(axis.title  = element_text(size = 11))+
+    theme(axis.text = element_text(size = 11))+
+    scale_color_manual(name="Acreage",
+                       labels=c("Corn","Irrigated Soybeans","Total Soybean acreage", 'Rice'),
+                       values=c("red","green","blue", "purple")                        )
+)
 
-   #*********crop Rotation********#
-   
+#*********crop Rotation********#
+
 
 
 
@@ -207,17 +207,17 @@ datat1 <- data.table::as.data.table(datat1)
 datat2 <- data.table::as.data.table(datat2)
 
 (pixelcounts <- merge(datat1, datat2, by = c('x', 'y')) %>%
-  as.data.frame() %>%
-  'colnames<-'(c('x', 'y', 'value.x', 'value.y')) %>%
-  dplyr::filter(value.x > 0, value.y > 0) %>%
-  dplyr::group_by(value.x, value.y) %>%
-  dplyr::summarise(Count = dplyr::n()) %>%
-  dplyr::left_join(., CDL_code, by = c('value.x' = 'value'),copy=T) %>%
-  dplyr::left_join(., CDL_code, by = c('value.y' = 'value'),copy=T) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(-value.x, -value.y) %>%
-  dplyr::rename(From = Crop.x, To = Crop.y) %>%
-  dplyr::mutate(Acreage = Count*0.222394)
+    as.data.frame() %>%
+    'colnames<-'(c('x', 'y', 'value.x', 'value.y')) %>%
+    dplyr::filter(value.x > 0, value.y > 0) %>%
+    dplyr::group_by(value.x, value.y) %>%
+    dplyr::summarise(Count = dplyr::n()) %>%
+    dplyr::left_join(., CDL_code, by = c('value.x' = 'value'),copy=T) %>%
+    dplyr::left_join(., CDL_code, by = c('value.y' = 'value'),copy=T) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(-value.x, -value.y) %>%
+    dplyr::rename(From = Crop.x, To = Crop.y) %>%
+    dplyr::mutate(Acreage = Count*0.222394)
 )
 
 
@@ -227,8 +227,9 @@ datat2 <- data.table::as.data.table(datat2)
 #----Trying this---#
 
 Dipo<-function(AR,a,b){
-   datat1<- raster::rasterToPoints(AR[[a]])
-  datat2 <- raster::rasterToPoints(AR[[b]])
+  for (i in a:b){
+  datat1<- raster::rasterToPoints(AR[[i]])
+  datat2 <- raster::rasterToPoints(AR[[i+1]])
   
   datat1<- data.table::as.data.table(datat1)
   datat2 <-data.table::as.data.table(datat2)
@@ -243,56 +244,112 @@ Dipo<-function(AR,a,b){
     dplyr::ungroup() %>%
     dplyr::select(-value.x, -value.y) %>%
     dplyr::rename(From = Crop.x, To = Crop.y) %>%
-    dplyr::mutate(Acreage = Count*0.222394)
-  names(out_list)[i] <- paste("name", i, sep = "_")  
+    dplyr::mutate(Acreage = Count*0.222394)%>%
+  dplyr::mutate(CR_From =2009+i)%>%
+  dplyr::mutate(CR_to=2010+i)
+  write.csv(Dipo, paste(2009+i,"_", 2010+i,".csv"), row.names = FALSE)
   return(Dipo)
-}
-Landuse<-Dipo(AR,1,2)
-
-memory.limit(size=1000000)
-for (i in 1:2){
-  print(i)
-  print(i+1)
-  Landuse<-Dipo(AR,i,i+1)
-
-}
-
-#--save rotation by year--#
-  saveRDS(Landuse, file=paste0("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Landuse[i].rds"))
-
-  cropdata<-c()
-####----downloadlanduse***#
-Dipo2<-function(AR,i,b){
-  
-  for(i in 1:b){
-    print(i)
-    
-  cropdata[[i]]<-freq(AR[[i]])%>% 
-    #--- matrix to data.frame ---#
-    data.frame(.) %>% 
-    #--- find acreage ---#
-    #---0.222394 is the conversion factor---#
-    mutate(Acreage = count*0.222394)%>%
-    #--- code ---#
-    left_join(CDL_code, by=c("value" = "value")) %>%
-    #--- keep only the share of rice and soy ---#
-    filter(value %in% c(1, 3, 5), )  %>%
-    subset( .,select=c( Crop, Acreage))%>%
-    #--- long to wide ---#
-    spread(Crop,Acreage)  %>%
-    #---year--#
-    mutate(year =i) 
   }
-  saveRDS(cropdata, file="C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/output.rds")
-  cropdata<-readRDS("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/output.rds")
-   Acreage<- do.call(rbind, cropdata)%>%
-    rename(id = year) %>%
-    left_join(duration, by=c("id" = "id"))
- 
-  saveRDS(Acreage, file="C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Acreage.rds")
- return(Acreage)
-  }
+}
+Landuse<-Dipo(AR,1,1)
 
-acres<-Dipo2(AR,1,10)
-acres
-readRDS("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Acreage.rds")
+
+#Crop Rotation
+
+
+AR_CDL_path<-"C:/Users/obemb/OneDrive/Desktop/data/Data/cdl"
+
+AR=stack(AR2010,AR2011,AR2012)
+AR
+reclass_df<-c(0,0,0,
+              1,1,1,
+              2,2,2,
+              3,3,3,
+              4,4,4,
+              5,5,5,
+              6,9,0,
+              10,10,10,
+              11,60,0,
+              61,61,61,
+              62,255,0
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 3,
+                    byrow = TRUE)
+chm_classified1 <- reclassify(AR,
+                             reclass_m)
+# assign all pixels that equal 0 to NA or no data value
+chm_classified1[chm_classified1 == 0] <- NA
+show(chm_classified1)
+reclass_df<-c(1,1,
+              2,2,
+              3,3,
+              4,4,
+              5,5,
+              6,NA,
+              10,6,
+              61,7
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2 <- reclassify(chm_classified1,
+                             reclass_m)
+show(chm_classified2)
+Dipo<-freq(chm_classified)
+color=c("yellow", "green", "red","pink", "blue","purple", "orange" )
+plot(chm_classified2,
+     col = color)
+
+
+plot(chm_classified2,
+     legend = FALSE,
+     col = color, axes = FALSE)
+
+legend("bottomright",
+       legend = c("corn", "cotton", "Rice","Sorghum","Soybeans","Peanut","Fallow"),
+       fill = color,
+       border = FALSE,
+       bty = "n") # turn off legend border
+
+
+reclass_df<-c(1,NA,
+              2,NA,
+              3,3,
+              4,NA,
+              5,5,
+              6,NA,
+              7,NA
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified3 <- reclassify(chm_classified2,
+                             reclass_m)
+show(chm_classified3)
+color2=c( "red", "blue" )
+plot(chm_classified3,
+     legend = FALSE,
+     col = color2, axes = FALSE)
+
+legend("bottomright",
+       legend = c( "Rice","Soybeans"),
+       fill = color2,
+       border = FALSE,
+       bty = "n") # turn off legend border
+
+diff<-chm_classified3[[1]]-chm_classified3[[2]]
+plot(diff)
+Freq_diff<-freq(diff)
+color3=c( "red", 'green',"blue"  )
+plot(diff,
+     legend = F,
+     col = color3, axes = FALSE,
+     box = FALSE,
+     main = "Rice-Soybeans Rotations- 2010-2011")
+
+legend("bottomright",
+       legend = c("To Rice from Soybeans",  "Continuos cropping","To Soybeans from Rice" ),
+       fill = color3,
+       border = FALSE,
+       bty = "n") # turn off legend border
