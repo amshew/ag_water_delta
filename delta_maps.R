@@ -4,27 +4,36 @@
 
 # Clear Environment and Load Functional Libraries/Dependencies
 rm(list=ls())
-get <- c("RColorBrewer","raster","sf","ggplot2", "GSODR","tidyverse", "tidyUSDA",
-         "vtable", "tools", "broom", "mapproj", "scales", "ggmap", "viridis")
+get <- c("raster", "sf", "GSODR", "tidyUSDA",
+         "vtable", "tidyverse", "tools", "broom", "dplyr", "readr",
+         "ggplot2","RColorBrewer","mapproj", "scales", "ggmap", "viridis")
 have   <- get %in% rownames(installed.packages())
 if(any(!have)) install.packages(get[!have])
 sapply(get, function(i) require(i, character.only=TRUE))
 options(digits = 6)
 
 
-# Get shapefiles
+# Get Arkansas shapefile
 us <-  getData("GADM", country="USA", path= "Data", level=2)
 ar <- us[us$NAME_1=="Arkansas",]
-plot(ar)
 
- # Get ag data
+# Get county-level rice data
 ar_rice_area <- getQuickstat(key = "2E139E04-368D-39C4-997A-1BBD0864B878",
-                        commodity = "rice", category = "area harvested",
-                        geographic_level = "county", state = "Arkansas", year = 2018)
+                        program = "SURVEY", commodity = "rice", category = "area harvested",
+                        geographic_level = "county", state = "Arkansas")
 
 ar_rice_prod <- getQuickstat(key = "2E139E04-368D-39C4-997A-1BBD0864B878",
-                             commodity = "rice", category = "production",
-                             geographic_level = "county", state = "Arkansas", year = 2018)
+                        program = "SURVEY", commodity = "rice", category = "production",
+                         geographic_level = "county", state = "Arkansas")
+
+ar_rice <- rbind(ar_rice_area, ar_rice_prod)
+ar_rice <- ar_rice[ar_rice$year>2000,]
+
+ar_rice_w <- pivot_wider(ar_rice,
+  names_from = c(statisticcat_desc, year),
+  values_from = Value
+)
+
 
 names(ar_rice_area)[names(ar_rice_area)=="Value"] <- "area_ac"
 names(ar_rice_prod)[names(ar_rice_prod)=="Value"] <- "prod_cwt"
