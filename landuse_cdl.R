@@ -259,7 +259,7 @@ Landuse<-Dipo(AR,1,1)
 
 AR_CDL_path<-"C:/Users/obemb/OneDrive/Desktop/data/Data/cdl"
 
-AR=stack(AR2010,AR2011,AR2012)
+AR=stack(AR2010,AR2011,AR2012,AR2013,AR2014)
 AR
 reclass_df<-c(0,0,0,
               1,1,1,
@@ -346,10 +346,256 @@ plot(diff,
      legend = F,
      col = color3, axes = FALSE,
      box = FALSE,
-     main = "Rice-Soybeans Rotations- 2010-2011")
+     main = "Rice-Soybeans Rotation- 2010-2011")
 
 legend("bottomright",
-       legend = c("To Rice from Soybeans",  "Continuos cropping","To Soybeans from Rice" ),
+       legend = c("To Rice from Soybeans",  "Continuous cropping","To Soybeans from Rice" ),
        fill = color3,
        border = FALSE,
        bty = "n") # turn off legend border
+
+
+#Overlay
+#2010
+reclass_df<-c(0,0,0,
+              1,1,1,
+              2,2,2,
+              3,3,3,
+              4,4,4,
+              5,5,5,
+              6,9,0,
+              10,10,10,
+              11,60,0,
+              61,61,61,
+              62,255,0
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 3,
+                    byrow = TRUE)
+chm_classified2010_1 <- reclassify(AR2010,
+                              reclass_m)
+# assign all pixels that equal 0 to NA or no data value
+chm_classified2010_1[chm_classified2010_1 == 0] <- NA
+show(chm_classified2010_1)
+reclass_df<-c(1,1,
+              2,2,
+              3,3,
+              4,4,
+              5,5,
+              6,NA,
+              10,6,
+              61,7
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2010_2<- reclassify(chm_classified2010_1,
+                              reclass_m)
+show(chm_classified2010_2)
+
+
+reclass_df<-c(1,NA,
+              2,NA,
+              3,3,
+              4,NA,
+              5,5,
+              6,NA,
+              7,NA
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2010_3 <- reclassify(chm_classified2010_2,
+                              reclass_m)
+show(chm_classified2010_3)
+
+#2011
+reclass_df<-c(0,0,0,
+              1,1,1,
+              2,2,2,
+              3,3,3,
+              4,4,4,
+              5,5,5,
+              6,9,0,
+              10,10,10,
+              11,60,0,
+              61,61,61,
+              62,255,0
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 3,
+                    byrow = TRUE)
+chm_classified2011_1 <- reclassify(AR2011,
+                                   reclass_m)
+# assign all pixels that equal 0 to NA or no data value
+chm_classified2011_1[chm_classified2011_1 == 0] <- NA
+show(chm_classified2011_1)
+reclass_df<-c(1,1,
+              2,2,
+              3,3,
+              4,4,
+              5,5,
+              6,NA,
+              10,6,
+              61,7
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2011_2<- reclassify(chm_classified2011_1,
+                                  reclass_m)
+show(chm_classified2011_2)
+
+
+reclass_df<-c(1,NA,
+              2,NA,
+              3,3,
+              4,NA,
+              5,5,
+              6,NA,
+              7,NA
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2011_3 <- reclassify(chm_classified2011_2,
+                                   reclass_m)
+show(chm_classified2011_3)
+
+#2014
+
+reclass_df<-c(0,0,0,
+              1,1,1,
+              2,2,2,
+              3,3,3,
+              4,4,4,
+              5,5,5,
+              6,9,0,
+              10,10,10,
+              11,60,0,
+              61,61,61,
+              62,255,0
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 3,
+                    byrow = TRUE)
+chm_classified2012_1 <- reclassify(AR2012,
+                                   reclass_m)
+# assign all pixels that equal 0 to NA or no data value
+chm_classified2012_1[chm_classified2012_1 == 0] <- NA
+show(chm_classified2012_1)
+reclass_df<-c(1,1,
+              2,2,
+              3,3,
+              4,4,
+              5,5,
+              6,NA,
+              10,6,
+              61,7
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2012_2<- reclassify(chm_classified2012_1,
+                                  reclass_m)
+show(chm_classified2012_2)
+
+
+reclass_df<-c(1,NA,
+              2,NA,
+              3,3,
+              4,NA,
+              5,5,
+              6,NA,
+              7,NA
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2012_3 <- reclassify(chm_classified2012_2,
+                                   reclass_m)
+show(chm_classified2012_3)
+#2010to2011
+Dipo<-function(x,y){ifelse(x>y,1, ifelse(x<y,-1,ifelse(x==y, x,y)))}
+
+Diff<-overlay(chm_classified2010_3,chm_classified2011_3,fun=Dipo)
+plot(Diff)
+
+
+
+color3=c( "red","blue", 'green','yellow'  )
+plot(Diff,
+     legend = F,
+     col = color3, axes = FALSE,
+     box = FALSE,
+     main = "Rice-Soybeans Rotation- 2010-2011")
+
+legend("bottomright",
+       legend = c("Rice to Soybeans","Soybeans to Rice",  "Rice Monocropping",  "Soybeans Monocropping"),
+       fill = color3,
+       border = FALSE,
+       bty = "n") # turn off legend border
+
+#2011to2012
+#Dipo<-function(x,y){ifelse(x>y,x-y, ifelse(x<y,x-y,ifelse(x==y, x,y)))}
+Dipo<-function(x,y){ifelse(x>y,1, ifelse(x<y,-1,ifelse(x==y, x,y)))}
+
+Diff<-overlay(chm_classified2011_3,chm_classified2012_3,fun=Dipo)
+plot(Diff)
+
+
+
+
+color3=c( "red","blue", 'green','yellow'  )
+plot(Diff,
+     legend = F,
+     col = color3, axes = FALSE,
+     box = FALSE,
+     main = "Rice-Soybeans Rotation- 2011-2012")
+
+legend("bottomright",
+       legend = c("Rice to Soybeans","Soybeans to Rice",  "Rice Monocropping",  "Soybeans Monocropping"),
+       fill = color3,
+       border = FALSE,
+       bty = "n") # turn off legend border
+
+
+mapview(Diff)
+
+
+#2011to2012-CODE for rotation
+#-1-r-s-r
+#1-s-r-s
+#2-s-s-r
+#-2- r-r-s
+#-3-r-s-s
+#3-s-s-r
+#3-rice
+#5-S
+#rotation to other crops
+
+Dipo(1,2,3)
+Dipo<-function(x,y,z){ifelse(x==y & y==z,x,
+                             ifelse(x==z& x<y,-1,ifelse(x==z& x>y,1,
+                                              ifelse(x==y& x>z, 2,
+                                                           ifelse(x==y& x<z,-2,ifelse(z==y& x>z, 3,
+                                                                        ifelse(z==y& x<z, -3,0)))))))}
+
+
+Diff<-overlay(chm_classified2010_3,chm_classified2011_3,chm_classified2012_3,fun=Dipo)
+
+TETE<-freq(Diff)
+color=c("yellow", "green","purple" ,"pink","orange" ,"red", "blue" )
+plot(Diff,
+     legend = F,
+     col = color, axes = FALSE,
+     box = FALSE,
+     main = "Rice-Soybeans Rotation- 2010-2013")
+
+legend("bottomright",
+       legend = c("R-S-S","R-R-S",  "R-S-R",  "S-R-S", "S-S-R","Rice Monocropping", "Soybeans Monocropping"),
+       fill = color,
+       border = FALSE,
+       bty = "n") # turn off legend border
+
+
