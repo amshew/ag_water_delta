@@ -257,10 +257,6 @@ Landuse<-Dipo(AR,1,1)
 #Crop Rotation
 
 
-AR_CDL_path<-"C:/Users/obemb/OneDrive/Desktop/data/Data/cdl"
-
-AR=stack(AR2010,AR2011,AR2012,AR2013,AR2014)
-AR
 reclass_df<-c(0,0,0,
               1,1,1,
               2,2,2,
@@ -462,7 +458,7 @@ chm_classified2011_3 <- reclassify(chm_classified2011_2,
                                    reclass_m)
 show(chm_classified2011_3)
 
-#2014
+#2012
 
 reclass_df<-c(0,0,0,
               1,1,1,
@@ -515,7 +511,388 @@ reclass_m <- matrix(reclass_df,
 chm_classified2012_3 <- reclassify(chm_classified2012_2,
                                    reclass_m)
 show(chm_classified2012_3)
-#2010to2011
+
+#2013
+
+
+reclass_df<-c(0,0,0,
+              1,1,1,
+              2,2,2,
+              3,3,3,
+              4,4,4,
+              5,5,5,
+              6,9,0,
+              10,10,10,
+              11,60,0,
+              61,61,61,
+              62,255,0
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 3,
+                    byrow = TRUE)
+chm_classified2013_1 <- reclassify(AR2013,
+                                   reclass_m)
+# assign all pixels that equal 0 to NA or no data value
+chm_classified2013_1[chm_classified2013_1 == 0] <- NA
+show(chm_classified2013_1)
+reclass_df<-c(1,1,
+              2,2,
+              3,3,
+              4,4,
+              5,5,
+              6,NA,
+              10,6,
+              61,7
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2013_2<- reclassify(chm_classified2013_1,
+                                  reclass_m)
+show(chm_classified2013_2)
+
+
+reclass_df<-c(1,NA,
+              2,NA,
+              3,3,
+              4,NA,
+              5,5,
+              6,NA,
+              7,NA
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2013_3 <- reclassify(chm_classified2013_2,
+                                   reclass_m)
+show(chm_classified2013_3)
+
+#2014
+
+
+reclass_df<-c(0,0,0,
+              1,1,1,
+              2,2,2,
+              3,3,3,
+              4,4,4,
+              5,5,5,
+              6,9,0,
+              10,10,10,
+              11,60,0,
+              61,61,61,
+              62,255,0
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 3,
+                    byrow = TRUE)
+chm_classified2014_1 <- reclassify(AR2014,
+                                   reclass_m)
+# assign all pixels that equal 0 to NA or no data value
+chm_classified2014_1[chm_classified2014_1 == 0] <- NA
+show(chm_classified2014_1)
+reclass_df<-c(1,1,
+              2,2,
+              3,3,
+              4,4,
+              5,5,
+              6,NA,
+              10,6,
+              61,7
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2014_2<- reclassify(chm_classified2014_1,
+                                  reclass_m)
+show(chm_classified2014_2)
+
+
+reclass_df<-c(1,NA,
+              2,NA,
+              3,3,
+              4,NA,
+              5,5,
+              6,NA,
+              7,NA
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2014_3 <- reclassify(chm_classified2014_2,
+                                   reclass_m)
+show(chm_classified2014_3)
+
+#2015
+
+
+reclass_df<-c(0,0,0,
+              1,1,1,
+              2,2,2,
+              3,3,3,
+              4,4,4,
+              5,5,5,
+              6,9,0,
+              10,10,10,
+              11,60,0,
+              61,61,61,
+              62,255,0
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 3,
+                    byrow = TRUE)
+chm_classified2015_1 <- reclassify(AR2015,
+                                   reclass_m)
+# assign all pixels that equal 0 to NA or no data value
+chm_classified2015_1[chm_classified2015_1 == 0] <- NA
+show(chm_classified2015_1)
+reclass_df<-c(1,1,
+              2,2,
+              3,3,
+              4,4,
+              5,5,
+              6,NA,
+              10,6,
+              61,7
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2015_2<- reclassify(chm_classified2015_1,
+                                  reclass_m)
+show(chm_classified2015_2)
+
+
+reclass_df<-c(1,NA,
+              2,NA,
+              3,3,
+              4,NA,
+              5,5,
+              6,NA,
+              7,NA
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2015_3 <- reclassify(chm_classified2015_2,
+                                   reclass_m)
+show(chm_classified2015_3)
+#2016
+reclass_df<-c(0,0,0,
+              1,1,1,
+              2,2,2,
+              3,3,3,
+              4,4,4,
+              5,5,5,
+              6,9,0,
+              10,10,10,
+              11,60,0,
+              61,61,61,
+              62,255,0
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 3,
+                    byrow = TRUE)
+chm_classified2016_1 <- reclassify(AR2016,
+                                   reclass_m)
+# assign all pixels that equal 0 to NA or no data value
+chm_classified2016_1[chm_classified2016_1 == 0] <- NA
+show(chm_classified2016_1)
+reclass_df<-c(1,1,
+              2,2,
+              3,3,
+              4,4,
+              5,5,
+              6,NA,
+              10,6,
+              61,7
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2016_2<- reclassify(chm_classified2016_1,
+                                  reclass_m)
+show(chm_classified2016_2)
+
+
+reclass_df<-c(1,NA,
+              2,NA,
+              3,3,
+              4,NA,
+              5,5,
+              6,NA,
+              7,NA
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2016_3 <- reclassify(chm_classified2016_2,
+                                   reclass_m)
+show(chm_classified2016_3)
+
+#2017
+reclass_df<-c(0,0,0,
+              1,1,1,
+              2,2,2,
+              3,3,3,
+              4,4,4,
+              5,5,5,
+              6,9,0,
+              10,10,10,
+              11,60,0,
+              61,61,61,
+              62,255,0
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 3,
+                    byrow = TRUE)
+chm_classified2017_1 <- reclassify(AR2017,
+                                   reclass_m)
+# assign all pixels that equal 0 to NA or no data value
+chm_classified2017_1[chm_classified2017_1 == 0] <- NA
+show(chm_classified2017_1)
+reclass_df<-c(1,1,
+              2,2,
+              3,3,
+              4,4,
+              5,5,
+              6,NA,
+              10,6,
+              61,7
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2017_2<- reclassify(chm_classified2017_1,
+                                  reclass_m)
+show(chm_classified2017_2)
+
+
+reclass_df<-c(1,NA,
+              2,NA,
+              3,3,
+              4,NA,
+              5,5,
+              6,NA,
+              7,NA
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2017_3 <- reclassify(chm_classified2017_2,
+                                   reclass_m)
+show(chm_classified2017_3)
+
+#2018
+
+reclass_df<-c(0,0,0,
+              1,1,1,
+              2,2,2,
+              3,3,3,
+              4,4,4,
+              5,5,5,
+              6,9,0,
+              10,10,10,
+              11,60,0,
+              61,61,61,
+              62,255,0
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 3,
+                    byrow = TRUE)
+chm_classified2018_1 <- reclassify(AR2018,
+                                   reclass_m)
+# assign all pixels that equal 0 to NA or no data value
+chm_classified2018_1[chm_classified2018_1 == 0] <- NA
+show(chm_classified2018_1)
+reclass_df<-c(1,1,
+              2,2,
+              3,3,
+              4,4,
+              5,5,
+              6,NA,
+              10,6,
+              61,7
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2018_2<- reclassify(chm_classified2018_1,
+                                  reclass_m)
+show(chm_classified2018_2)
+
+
+reclass_df<-c(1,NA,
+              2,NA,
+              3,3,
+              4,NA,
+              5,5,
+              6,NA,
+              7,NA
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2018_3 <- reclassify(chm_classified2018_2,
+                                   reclass_m)
+show(chm_classified2018_3)
+
+#2019
+
+
+reclass_df<-c(0,0,0,
+              1,1,1,
+              2,2,2,
+              3,3,3,
+              4,4,4,
+              5,5,5,
+              6,9,0,
+              10,10,10,
+              11,60,0,
+              61,61,61,
+              62,255,0
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 3,
+                    byrow = TRUE)
+chm_classified2019_1 <- reclassify(AR2019,
+                                   reclass_m)
+# assign all pixels that equal 0 to NA or no data value
+chm_classified2019_1[chm_classified2019_1 == 0] <- NA
+show(chm_classified2019_1)
+reclass_df<-c(1,1,
+              2,2,
+              3,3,
+              4,4,
+              5,5,
+              6,NA,
+              10,6,
+              61,7
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2019_2<- reclassify(chm_classified2019_1,
+                                  reclass_m)
+show(chm_classified2019_2)
+
+
+reclass_df<-c(1,NA,
+              2,NA,
+              3,3,
+              4,NA,
+              5,5,
+              6,NA,
+              7,NA
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 2,
+                    byrow = TRUE)
+chm_classified2019_3 <- reclassify(chm_classified2019_2,
+                                   reclass_m)
+show(chm_classified2019_3)
+
+
+#2010to2019
 Dipo<-function(x,y){ifelse(x>y,1, ifelse(x<y,-1,ifelse(x==y, x,y)))}
 
 Diff<-overlay(chm_classified2010_3,chm_classified2011_3,fun=Dipo)
@@ -563,7 +940,7 @@ legend("bottomright",
 mapview(Diff)
 
 
-#2011to2012-CODE for rotation
+#2010to2012-CODE for rotation
 #-1-r-s-r
 #1-s-r-s
 #2-s-s-r
@@ -572,9 +949,8 @@ mapview(Diff)
 #3-s-s-r
 #3-rice
 #5-S
-#rotation to other crops
+#0rotation to other crops
 
-Dipo(1,2,3)
 Dipo<-function(x,y,z){ifelse(x==y & y==z,x,
                              ifelse(x==z& x<y,-1,ifelse(x==z& x>y,1,
                                               ifelse(x==y& x>z, 2,
@@ -582,20 +958,196 @@ Dipo<-function(x,y,z){ifelse(x==y & y==z,x,
                                                                         ifelse(z==y& x<z, -3,0)))))))}
 
 
-Diff<-overlay(chm_classified2010_3,chm_classified2011_3,chm_classified2012_3,fun=Dipo)
+Diff2010_2012<-overlay(chm_classified2010_3,chm_classified2011_3,chm_classified2012_3,fun=Dipo)
 
-TETE<-freq(Diff)
+TETE<-freq(Diff2010_2012)
 color=c("yellow", "green","purple" ,"pink","orange" ,"red", "blue" )
-plot(Diff,
+plot(Diff2010_2012,
      legend = F,
      col = color, axes = FALSE,
      box = FALSE,
-     main = "Rice-Soybeans Rotation- 2010-2013")
+     main = "Rice-Soybeans Rotation- 2010-2012",cex.main=0.85, adj = 0., line=-0.5)
 
 legend("bottomright",
        legend = c("R-S-S","R-R-S",  "R-S-R",  "S-R-S", "S-S-R","Rice Monocropping", "Soybeans Monocropping"),
        fill = color,
        border = FALSE,
        bty = "n") # turn off legend border
+mapview(Diff)
+
+#2010to2012-CODE for rotation
+#-1-r-s-r
+#1-s-r-s
+#2-s-s-r
+#-2- r-r-s
+#-3-r-s-s
+#3-s-s-r
+#3-rice
+#5-S
+#0-rotation to other crops
+
+#water use per pixel-convert each pixel to water use.
+
+Rice<-2.13255*0.222394 #converts to ac/ft of water per pixel
+  Soybeans<-1.79134*0.222394 #converts to ac/ft of water per pixel
+
+Dipo<-function(x){ifelse(x==3,Rice,
+                             ifelse(x==5, Soybeans,0))}
+Dipo(5)
+chm_classified2010_3
+#water use per pixel from  2010-2012
+wu_2010<-calc(chm_classified2010_3,fun=Dipo)
+wu_2011<-calc(chm_classified2011_3,fun=Dipo)
+wu_2012<-calc(chm_classified2012_3,fun=Dipo)
+wu_2013<-calc(chm_classified2013_3,fun=Dipo)
+wu_2014<-calc(chm_classified2014_3,fun=Dipo)
+wu_2015<-calc(chm_classified2015_3,fun=Dipo)
+wu_2016<-calc(chm_classified2016_3,fun=Dipo)
+wu_2017<-calc(chm_classified2017_3,fun=Dipo)
+wu_2018<-calc(chm_classified2018_3,fun=Dipo)
+wu_2019<-calc(chm_classified2019_3,fun=Dipo)
+wu_2010
+color2=c( "red", "blue" )
+plot(wu_2010,
+     legend = FALSE,
+     col = color2, axes = FALSE)
+
+legend("bottomright",
+       legend = c( "Rice-(0.474266ac/ft)","Soybeans-(0.398383ac/ft)"),
+       fill = color2,
+       border = FALSE,
+       bty = "n") # turn off legend border
+
+#Total water use from 2010-2012 rotation
+
+#wu_2013,wu_2014,wu_2015,wu_2016,wu_2017,wu_2018,wu_2019
+
+wateruse<-function(x,y,z){return(x+y+z)}
 
 
+WU2010_2012<-overlay(wu_2010,wu_2011,wu_2012,fun=wateruse)
+plot(WU2010_2012)
+WU2013_2015<-overlay(wu_2013,wu_2014,wu_2015,fun=wateruse)
+plot(WU2013_2015)
+WU2016_2018<-overlay(wu_2016,wu_2017,wu_2018,fun=wateruse)
+plot(WU2016_2018)
+
+WU2010_2018<-overlay(WU2010_2012,WU2013_2015,WU2016_2018,fun=wateruse)
+plot(WU2010_2018)
+#Tolu<-freq(WU2010_2012)
+#scale for rotation
+#r-s-s-1.27103
+#r-r-s-1.34692
+#r-s-r-1.34692
+#s-r-s-1.27103
+#s-s-r-1.27103
+#r-1.4228
+#s-1.19515
+color=c("blue", "pink","green" ,"red" )
+cuts=c( 3.58545,3.81309,4.04076,4.2684) #set breaks
+plot(WU2010_2018)
+addd<-function(n, alpha = 1, begin = 0, end = 1, direction =- 1){
+  viridis(n, alpha, begin, end, direction, option = "viridis")
+}
+
+mapview(WU2010_2018,layer.name = "Delta",
+        map = NULL,
+        maxpixels = mapviewGetOption("mapview.maxpixels"),
+        col.regions = addd,
+        at = NULL,
+        na.color = mapviewGetOption("na.color"),
+        use.layer.names = F,
+        map.types = mapviewGetOption("basemaps"),
+        legend = mapviewGetOption("legend"),
+        legend.opacity = 1,
+        trim = F,
+        verbose = mapviewGetOption("verbose"),
+        homebutton = TRUE,
+        method = mapviewGetOption("method"),
+        label = TRUE)
+  
+  
+
+plot2012<-plot(WU2010_2012,
+     legend = F,
+     col = color, axes = FALSE,
+     box = FALSE,
+     main = "Distribution of the estimated total water use per pixel- 2010-2012",cex.main=0.85, adj = 0., line=-0.5)
+#2010-2012
+legend("bottomright",
+       legend = c("Soybeans Monocropping-3.6 ac/ft.","Primarily SB-R-3.81ac/ft.","Primarily Rice-R-4.04ac/ft.",  "Rice Monocropping-4.27ac/ft" ),
+       fill = color,
+       border = FALSE,
+       bty = "n",cex=.75,title="Crop Rotation/Total water use ") # turn off legend border
+
+
+
+plot2015<-plot(WU2013_2015,
+               legend = F,
+               col = color, axes = FALSE,
+               box = FALSE,
+               main = "Distribution of the estimated total water use per pixel- 2013-2015",cex.main=0.85, adj = 0., line=-0.5)
+#2010-2012
+legend("bottomright",
+       legend = c("Soybeans Monocropping-3.6 ac/ft.","Primarily SB-R-3.81ac/ft.","Primarily Rice-R-4.04ac/ft.",  "Rice Monocropping-4.27ac/ft" ),
+       fill = color,
+       border = FALSE,
+       bty = "n",cex=.75,title="Crop Rotation/Total water use ") # turn off legend border
+
+
+plot2018<-plot(WU2016_2018,
+               legend = F,
+               col = color, axes = FALSE,
+               box = FALSE,
+               main = "Distribution of the estimated total water use per pixel- 2015-2018",cex.main=0.85, adj = 0., line=-0.5)
+#2010-2012
+legend("bottomright",
+       legend = c("Soybeans Monocropping-3.6 ac/ft.","Primarily SB-R-3.81ac/ft.","Primarily Rice-R-4.04ac/ft.",  "Rice Monocropping-4.27ac/ft" ),
+       fill = color,
+       border = FALSE,
+       bty = "n",cex=.75,title="Crop Rotation/Total water use ") # turn off legend border   
+  
+wateruse<-function(x,y){return(x-y)}
+diffWU2010_2015<-overlay(WU2010_2012,WU2013_2015,fun=wateruse)
+diffWU2015_2018<-overlay(WU2013_2015,WU2016_2018,fun=wateruse)
+mapview(diffWU2010_2015)
+plot(diffWU2010_2015)
+diffWU2010_2015[diffWU2010_2015 == 0] <- NA
+diffWU2015_2018[diffWU2015_2018== 0] <- NA
+plot(diffWU2010_2015)
+color=c("blue", "pink","green" ,"red" )
+cuts=c( -0.227649,-0.07589,0.07589,0.227649) #set breaks
+
+plot(diffWU2010_2015,
+               legend = F,
+               col = color, axes = FALSE,
+               box = FALSE,
+               main = "Distribution of the estimated total water use per pixel- 2010-2015",cex.main=0.85, adj = 0., line=-0.5)
+#2010-2012
+legend("bottomright",
+       legend = c("R-S","Primarily SB-R.","Primarily Rice-SB/ft.",  "S-R" ),
+       fill = color,
+       border = FALSE,
+       bty = "n",cex=.75,title="Crop Rotation/Total water use ") # turn off legend border   
+
+#2015-2019
+plot(diffWU2015_2018,
+     legend = F,
+     col = color, axes = FALSE,
+     box = FALSE,
+     main = "Distribution of the estimated total water use per pixel- 2015_2018",cex.main=0.85, adj = 0., line=-0.5)
+#2010-2012
+legend("bottomright",
+       legend = c("R-S","Primarily SB-R.","Primarily Rice-SB/ft.",  "S-R" ),
+       fill = color,
+       border = FALSE,
+       bty = "n",cex=.75,title="Crop Rotation/Total water use ") # turn off legend border   
+
+
+AR_CDL_path<-"C:/Users/obemb/OneDrive/Desktop/data/Data/cdl"
+
+AR=stack(AR2010,AR2011,AR2012,AR2013,AR2014)
+AR
+freq<-function
+freq<-calc(AR, fun=, na.rm=T)
+#share of rice and soybean in AR
