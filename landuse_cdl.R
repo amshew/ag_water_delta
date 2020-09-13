@@ -64,7 +64,7 @@ memory.limit(size=100000)
 ######Download CDL*******************#
 
 (
-  AR_cdl<- getCDL(5, 2010:2019,location="C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/cdl")
+  AR_cdl<- getCDL(5, 2009:2019,location="C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/cdl")
 )
 show( AR_cdl$AR2015)
 crs(AR_cdl$AR2015)
@@ -94,9 +94,10 @@ CDL_code<- read.csv("cdl_codes_names.csv")
 duration<- data.frame(id=1:10,year=c(2010,2011,2012,2013,2014,2015,2016,2017,2018,2019))
 str(duration)
 
-AR=c(AR2010, AR2011,AR2012,AR2013,AR2014,AR2015,AR2016,AR2017,AR2018,AR2019)
+AR=c(AR2010,AR2011,AR2012,AR2013,AR2014,AR2015,AR2016,AR2017,AR2018,AR2019)
 AR
 
+#AR_stackfreq<-freq(AR, merge=TRUE)
 
 cropdata<-c()
 ####----downloadlanduse***#
@@ -257,6 +258,10 @@ Landuse<-Dipo(AR,1,1)
 #Crop Rotation
 
 
+AR_CDL_path<-"C:/Users/obemb/OneDrive/Desktop/data/Data/cdl"
+
+AR=stack(AR2010,AR2011,AR2012,AR2013,AR2014)
+AR
 reclass_df<-c(0,0,0,
               1,1,1,
               2,2,2,
@@ -378,7 +383,7 @@ reclass_df<-c(1,1,
               3,3,
               4,4,
               5,5,
-              6,NA,
+              6,0,
               10,6,
               61,7
 )
@@ -424,14 +429,14 @@ reclass_m <- matrix(reclass_df,
 chm_classified2011_1 <- reclassify(AR2011,
                                    reclass_m)
 # assign all pixels that equal 0 to NA or no data value
-chm_classified2011_1[chm_classified2011_1 == 0] <- NA
+#chm_classified2011_1[chm_classified2011_1 == 0] <- NA
 show(chm_classified2011_1)
 reclass_df<-c(1,1,
               2,2,
               3,3,
               4,4,
               5,5,
-              6,NA,
+              6,0,
               10,6,
               61,7
 )
@@ -485,7 +490,7 @@ reclass_df<-c(1,1,
               3,3,
               4,4,
               5,5,
-              6,NA,
+              6,0,
               10,6,
               61,7
 )
@@ -533,7 +538,7 @@ reclass_m <- matrix(reclass_df,
 chm_classified2013_1 <- reclassify(AR2013,
                                    reclass_m)
 # assign all pixels that equal 0 to NA or no data value
-chm_classified2013_1[chm_classified2013_1 == 0] <- NA
+#chm_classified2013_1[chm_classified2013_1 == 0] <- NA
 show(chm_classified2013_1)
 reclass_df<-c(1,1,
               2,2,
@@ -588,7 +593,7 @@ reclass_m <- matrix(reclass_df,
 chm_classified2014_1 <- reclassify(AR2014,
                                    reclass_m)
 # assign all pixels that equal 0 to NA or no data value
-chm_classified2014_1[chm_classified2014_1 == 0] <- NA
+#chm_classified2014_1[chm_classified2014_1 == 0] <- NA
 show(chm_classified2014_1)
 reclass_df<-c(1,1,
               2,2,
@@ -643,8 +648,8 @@ reclass_m <- matrix(reclass_df,
 chm_classified2015_1 <- reclassify(AR2015,
                                    reclass_m)
 # assign all pixels that equal 0 to NA or no data value
-chm_classified2015_1[chm_classified2015_1 == 0] <- NA
-show(chm_classified2015_1)
+#chm_classified2015_1[chm_classified2015_1 == 0] <- NA
+#show(chm_classified2015_1)
 reclass_df<-c(1,1,
               2,2,
               3,3,
@@ -695,7 +700,7 @@ reclass_m <- matrix(reclass_df,
 chm_classified2016_1 <- reclassify(AR2016,
                                    reclass_m)
 # assign all pixels that equal 0 to NA or no data value
-chm_classified2016_1[chm_classified2016_1 == 0] <- NA
+#chm_classified2016_1[chm_classified2016_1 == 0] <- NA
 show(chm_classified2016_1)
 reclass_df<-c(1,1,
               2,2,
@@ -748,7 +753,7 @@ reclass_m <- matrix(reclass_df,
 chm_classified2017_1 <- reclassify(AR2017,
                                    reclass_m)
 # assign all pixels that equal 0 to NA or no data value
-chm_classified2017_1[chm_classified2017_1 == 0] <- NA
+#chm_classified2017_1[chm_classified2017_1 == 0] <- NA
 show(chm_classified2017_1)
 reclass_df<-c(1,1,
               2,2,
@@ -802,7 +807,7 @@ reclass_m <- matrix(reclass_df,
 chm_classified2018_1 <- reclassify(AR2018,
                                    reclass_m)
 # assign all pixels that equal 0 to NA or no data value
-chm_classified2018_1[chm_classified2018_1 == 0] <- NA
+#chm_classified2018_1[chm_classified2018_1 == 0] <- NA
 show(chm_classified2018_1)
 reclass_df<-c(1,1,
               2,2,
@@ -857,7 +862,7 @@ reclass_m <- matrix(reclass_df,
 chm_classified2019_1 <- reclassify(AR2019,
                                    reclass_m)
 # assign all pixels that equal 0 to NA or no data value
-chm_classified2019_1[chm_classified2019_1 == 0] <- NA
+#chm_classified2019_1[chm_classified2019_1 == 0] <- NA
 show(chm_classified2019_1)
 reclass_df<-c(1,1,
               2,2,
@@ -891,7 +896,9 @@ chm_classified2019_3 <- reclassify(chm_classified2019_2,
                                    reclass_m)
 show(chm_classified2019_3)
 
-
+chm_classified2010_3[chm_classified2010_3 == 0] <- NA
+chm_classified2011_3[chm_classified2011_3 == 0] <- NA
+chm_classified2012_3[chm_classified2012_3 == 0] <- NA
 #2010to2019
 Dipo<-function(x,y){ifelse(x>y,1, ifelse(x<y,-1,ifelse(x==y, x,y)))}
 
@@ -905,7 +912,7 @@ plot(Diff,
      legend = F,
      col = color3, axes = FALSE,
      box = FALSE,
-     main = "Rice-Soybeans Rotation- 2010-2011")
+     main = "Rice-Soybeans Rotation- 2010-2011",cex.main=0.85, adj = 0., line=-0.5)
 
 legend("bottomright",
        legend = c("Rice to Soybeans","Soybeans to Rice",  "Rice Monocropping",  "Soybeans Monocropping"),
@@ -960,7 +967,7 @@ Dipo<-function(x,y,z){ifelse(x==y & y==z,x,
 
 Diff2010_2012<-overlay(chm_classified2010_3,chm_classified2011_3,chm_classified2012_3,fun=Dipo)
 
-TETE<-freq(Diff2010_2012)
+#TETE<-freq(Diff2010_2012)
 color=c("yellow", "green","purple" ,"pink","orange" ,"red", "blue" )
 plot(Diff2010_2012,
      legend = F,
@@ -1032,7 +1039,7 @@ plot(WU2013_2015)
 WU2016_2018<-overlay(wu_2016,wu_2017,wu_2018,fun=wateruse)
 plot(WU2016_2018)
 
-WU2010_2018<-overlay(WU2010_2012,WU2013_2015,WU2016_2018,fun=wateruse)
+WU2010_2018<lay(WU2010_2012,WU2013_2015,WU2016_2018,fun=wateruse)
 plot(WU2010_2018)
 #Tolu<-freq(WU2010_2012)
 #scale for rotation
@@ -1044,8 +1051,9 @@ plot(WU2010_2018)
 #r-1.4228
 #s-1.19515
 color=c("blue", "pink","green" ,"red" )
-cuts=c( 3.58545,3.81309,4.04076,4.2684) #set breaks
-plot(WU2010_2018)
+#cuts=c( 3.58545,3.81309,4.04076,4.2684) #set breaks
+cuts=c( 1.19515,1.27103,1.34692,1.4228) #set breaks
+plot(WU2010_2012)
 addd<-function(n, alpha = 1, begin = 0, end = 1, direction =- 1){
   viridis(n, alpha, begin, end, direction, option = "viridis")
 }
@@ -1086,7 +1094,7 @@ plot2015<-plot(WU2013_2015,
                legend = F,
                col = color, axes = FALSE,
                box = FALSE,
-               main = "Distribution of the estimated total water use per pixel- 2013-2015",cex.main=0.85, adj = 0., line=-0.5)
+               main = "Distribution of the estimated total water use per pixel- 2015-2018",cex.main=0.85, adj = 0., line=-0.5)
 #2010-2012
 legend("bottomright",
        legend = c("Soybeans Monocropping-3.6 ac/ft.","Primarily SB-R-3.81ac/ft.","Primarily Rice-R-4.04ac/ft.",  "Rice Monocropping-4.27ac/ft" ),
@@ -1095,11 +1103,11 @@ legend("bottomright",
        bty = "n",cex=.75,title="Crop Rotation/Total water use ") # turn off legend border
 
 
-plot2018<-plot(WU2016_2018,
+plot2019<-plot(WU2016_2018,
                legend = F,
                col = color, axes = FALSE,
                box = FALSE,
-               main = "Distribution of the estimated total water use per pixel- 2015-2018",cex.main=0.85, adj = 0., line=-0.5)
+               main = "Distribution of the estimated total water use per pixel- 2016-2018",cex.main=0.85, adj = 0., line=-0.5)
 #2010-2012
 legend("bottomright",
        legend = c("Soybeans Monocropping-3.6 ac/ft.","Primarily SB-R-3.81ac/ft.","Primarily Rice-R-4.04ac/ft.",  "Rice Monocropping-4.27ac/ft" ),
@@ -1109,45 +1117,262 @@ legend("bottomright",
   
 wateruse<-function(x,y){return(x-y)}
 diffWU2010_2015<-overlay(WU2010_2012,WU2013_2015,fun=wateruse)
-diffWU2015_2018<-overlay(WU2013_2015,WU2016_2018,fun=wateruse)
-mapview(diffWU2010_2015)
-plot(diffWU2010_2015)
+diffWU2016_2018<-overlay(WU2013_2015,WU2016_2018,fun=wateruse)
+#remove the zeros
 diffWU2010_2015[diffWU2010_2015 == 0] <- NA
-diffWU2015_2018[diffWU2015_2018== 0] <- NA
+diffWU2016_2018[diffWU2016_2018 == 0] <- NA
 plot(diffWU2010_2015)
-color=c("blue", "pink","green" ,"red" )
+summary(diffWU2010_2015)
+color=c("blue", "pink","green", "red" )
 cuts=c( -0.227649,-0.07589,0.07589,0.227649) #set breaks
 
-plot(diffWU2010_2015,
+plot2019<-plot(diffWU2016_2018,
                legend = F,
                col = color, axes = FALSE,
                box = FALSE,
-               main = "Distribution of the estimated total water use per pixel- 2010-2015",cex.main=0.85, adj = 0., line=-0.5)
+               main = "Distribution of the estimated total water use per pixel- 2010-2019",cex.main=0.85, adj = 0., line=-0.5)
 #2010-2012
 legend("bottomright",
-       legend = c("R-S","Primarily SB-R.","Primarily Rice-SB/ft.",  "S-R" ),
+       legend = c("Soybeans Monocropping-3.6 ac/ft.","Primarily SB-R-3.81ac/ft.","Primarily Rice-R-4.04ac/ft.",  "Rice Monocropping-4.27ac/ft" ),
        fill = color,
        border = FALSE,
        bty = "n",cex=.75,title="Crop Rotation/Total water use ") # turn off legend border   
 
-#2015-2019
-plot(diffWU2015_2018,
+ARBrisk<-brick(chm_classified2010_3,chm_classified2011_3,chm_classified2012_3,chm_classified2014_3)
+show(ARBrisk)
+reclass_df_rice<-c(3,1,
+              5,0
+)
+reclass_m_rice <- matrix(reclass_df_rice,
+                    ncol = 2,
+                    byrow = TRUE)
+AR_rice<- reclassify(ARBrisk,
+                     reclass_m_rice  )
+show(AR_rice)
+#soybean
+reclass_df_soybean<-c(3,0,
+                   5,1
+)
+reclass_m_soybean <- matrix(reclass_df_soybean,
+                         ncol = 2,
+                         byrow = TRUE)
+AR_soybean<- reclassify(ARBrisk,
+                     reclass_m_soybean )
+# assign all pixels that equal 0 to NA or no data value
+show(AR_soybean)
+
+occ_rice<-calc(AR_rice,sum)
+occ_soybean<-calc(AR_soybean,sum)
+show(occ_rice)
+show(occ_soybean)
+color=c("blue", "pink","purple","green", "red" )
+plot(occ_rice,
      legend = F,
      col = color, axes = FALSE,
      box = FALSE,
-     main = "Distribution of the estimated total water use per pixel- 2015_2018",cex.main=0.85, adj = 0., line=-0.5)
-#2010-2012
+     main = )
+
 legend("bottomright",
-       legend = c("R-S","Primarily SB-R.","Primarily Rice-SB/ft.",  "S-R" ),
+       legend = c("Zero Year"," One Year","two Years","Three Years",  " Four Years" ),
        fill = color,
        border = FALSE,
-       bty = "n",cex=.75,title="Crop Rotation/Total water use ") # turn off legend border   
+       bty = "n",cex=.75,title="Rice Crop Frequency-2010-2014") # turn off legend border   
+
+plot(occ_soybean,
+     legend = F,
+     col = color, axes = FALSE,
+     box = FALSE,
+     main = )
+
+legend("bottomright",
+       legend = c("Zero Year"," One Year","two Years","Three Years",  " Four Years" ),
+       fill = color,
+       border = FALSE,
+       bty = "n",cex=.75,title="Soybean Crop Frequency-2010-2014") # turn off legend border   
+-
+
+#sequence of rotation
+
+year_2010<-1000000000
+year_2011<-100000000
+year_2012<-10000000
+year_2013<-1000000
+year_2014<-100000
+year_2015<-10000
+year_2016<-1000
+year_2017<-100
+year_2018<-10
+year_2019<-1
+year <-year_2010+year_2011+year_2012+year_2013+year_2014+
+  year_2015+year_2016+year_2017+year_2018+year_2019
+yr_ar_10 <-chm_classified2010_3 * year_2010
+yr_ar_11 <- chm_classified2011_3 * year_2011
+yr_ar_12 <-chm_classified2012_3 * year_2012
+yr_ar_13 <- chm_classified2013_3 * year_2013
+yr_ar_14 <-chm_classified2014_3 * year_2014
+yr_ar_15 <- chm_classified2015_3 * year_2015
+yr_ar_16 <-chm_classified2016_3 * year_2016
+yr_ar_17 <- chm_classified2017_3 * year_2017
+yr_ar_18 <-chm_classified2018_3 * year_2018
+yr_ar_19 <- chm_classified2019_3 * year_2019
+all_ar <-yr_ar_13+yr_ar_14+yr_ar_15+ yr_ar_16+ yr_ar_17+
+  yr_ar_18 + yr_ar_19+yr_ar_10+yr_ar_11+yr_ar_12
+
+plot(all_ar)
+
+#top 6crops
 
 
-AR_CDL_path<-"C:/Users/obemb/OneDrive/Desktop/data/Data/cdl"
+reclass_df<-c(0,0,0,
+              1,1,1,
+              2,2,2,
+              3,3,3,
+              4,4,4,
+              5,5,5,
+              6,6,6,
+              10,10,10,
+              11,61,8,
+              63,255,0
+)
+reclass_m <- matrix(reclass_df,
+                    ncol = 3,
+                    byrow = TRUE)
+reclass_m 
+AR_classified2011_1 <- reclassify(AR2011,
+                                   reclass_m)
+# assign all pixels that equal 0 to NA or no data value
+#AR_classified2010_1[AR_classified2010_1 == 6] <- 0
+show(AR_classified2011_1)
 
-AR=stack(AR2010,AR2011,AR2012,AR2013,AR2014)
-AR
-freq<-function
-freq<-calc(AR, fun=, na.rm=T)
-#share of rice and soybean in AR
+reclass_df2<-c(1,2,
+              2,3,
+              3,4,
+              4,5,
+              5,6,
+              6,1,
+              8,1,
+              10,7,
+              0,0
+              
+)
+reclass_m2 <- matrix(reclass_df2,
+                    ncol = 2,
+                    byrow = TRUE)
+
+AR_classified2011_1<- reclassify(AR_classified2011_1,      
+                                 reclass_m2)
+show(AR_classified2011_1)
+#2-corn, 3-cotton,4-rice,5-sorghum,6-soybeans,7-peanut
+#Reclassification
+
+#2010
+AR_classified2010_a <- reclassify(AR2010,
+                                  reclass_m)
+show(AR_classified2010_a)
+AR_classified2010_b<- reclassify(AR_classified2010_a,      
+                                   reclass_m2)
+show(AR_classified2010_b)
+
+
+#2011
+AR_classified2011_a <- reclassify(AR2011,
+                                  reclass_m)
+show(AR_classified2011_a)
+AR_classified2011_b<- reclassify(AR_classified2011_a,      
+                                 reclass_m2)
+show(AR_classified2011_b)
+
+
+#2012
+AR_classified2012_a <- reclassify(AR2012,
+                                  reclass_m)
+show(AR_classified2012_a)
+AR_classified2012_b<- reclassify(AR_classified2012_a,      
+                                 reclass_m2)
+show(AR_classified2012_b)
+
+
+#2013
+AR_classified2013_a <- reclassify(AR2013,
+                                  reclass_m)
+show(AR_classified2013_a)
+AR_classified2013_b<- reclassify(AR_classified2013_a,      
+                                 reclass_m2)
+show(AR_classified2013_b)
+
+
+#2014
+AR_classified2014_a <- reclassify(AR2014,
+                                  reclass_m)
+show(AR_classified2014_a)
+AR_classified2014_b<- reclassify(AR_classified2014_a,      
+                                 reclass_m2)
+show(AR_classified2014_b)
+
+
+#2015
+AR_classified2015_a <- reclassify(AR2015,
+                                  reclass_m)
+show(AR_classified2015_a)
+AR_classified2015_b<- reclassify(AR_classified2015_a,      
+                                 reclass_m2)
+show(AR_classified2015_b)
+
+
+#2016
+AR_classified2016_a <- reclassify(AR2016,
+                                  reclass_m)
+show(AR_classified2016_a)
+AR_classified2016_b<- reclassify(AR_classified2016_a,      
+                                 reclass_m2)
+show(AR_classified2016_b)
+
+
+
+#2017
+AR_classified2017_a <- reclassify(AR2017,
+                                  reclass_m)
+show(AR_classified2017_a)
+AR_classified2017_b<- reclassify(AR_classified2017_a,      
+                                 reclass_m2)
+show(AR_classified2017_b)
+
+
+#2018
+AR_classified2018_a <- reclassify(AR2018,
+                                  reclass_m)
+show(AR_classified2018_a)
+AR_classified2018_b<- reclassify(AR_classified2018_a,      
+                                 reclass_m2)
+show(AR_classified2018_b)
+
+#2019
+AR_classified2019_a <- reclassify(AR2019,
+                                  reclass_m)
+show(AR_classified2019_a)
+AR_classified2019_b<- reclassify(AR_classified2019_a,      
+                                 reclass_m2)
+show(AR_classified2019_b)
+plot(AR_classified2019_b)
+
+
+
+yr_ar_10 <-AR_classified2010_b * year_2010
+yr_ar_11 <- AR_classified2011_b * year_2011
+yr_ar_12 <-AR_classified2012_b * year_2012
+yr_ar_13 <- AR_classified2013_b * year_2013
+yr_ar_14 <-AR_classified2014_b * year_2014
+yr_ar_15 <- AR_classified2015_b * year_2015
+yr_ar_16 <-AR_classified2016_b * year_2016
+yr_ar_17 <- AR_classified2017_b * year_2017
+yr_ar_18 <-AR_classified2018_b * year_2018
+yr_ar_19 <- AR_classified2019_b * year_2019
+all_ar <-yr_ar_13+yr_ar_14+yr_ar_15+ yr_ar_16+ yr_ar_17+
+  yr_ar_18 + yr_ar_19+yr_ar_11+yr_ar_12
+
+plot(all_ar)
+
+Count<-freq(all_ar)
+view(Count)
+mapview(all_ar)
+show(all_ar)
