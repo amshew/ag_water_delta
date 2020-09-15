@@ -507,4 +507,242 @@ plot2015<-plot(WU2013_2015,
                main = "Distribution of the estimated total water demand per pixel- 2015-2018",cex.main=0.85, adj = 0., line=-0.5)
 #2013-2015
 legend("bottomright",
-       legend = c("Soybeans Monocropping-3.6 ac/ft.","Primarily SB-R-3.81ac/ft.","Primarily Rice-R-
+       legend = c("Soybeans Monocropping-3.6 ac/ft.","Primarily SB-R-3.81ac/ft.","Primarily Rice-R-4.04ac/ft.",  "Rice Monocropping-4.27ac/ft" ),
+       fill = color,
+       border = FALSE,
+       bty = "n",cex=.75,title="Crop Rotation/Total water demand ") # turn off legend border
+
+
+plot2019<-plot(WU2016_2018,
+               legend = F,
+               col = color, axes = FALSE,
+               box = FALSE,
+               main = "Distribution of the estimated total water demand per pixel- 2016-2018",cex.main=0.85, adj = 0., line=-0.5)
+#2016-2019
+legend("bottomright",
+       legend = c("Soybeans Monocropping-3.6 ac/ft.","Primarily SB-R-3.81ac/ft.","Primarily Rice-R-4.04ac/ft.",  "Rice Monocropping-4.27ac/ft" ),
+       fill = color,
+       border = FALSE,
+       bty = "n",cex=.75,title="Crop Rotation/Total water demand ") # turn off legend border   
+
+#2010-2019
+cuts=c( 3.58545,3.81309,4.04076,4.2684) #set breaks
+plot2010_19<-plot(WU2010_2018,
+                  legend = F,
+                  col = color, axes = FALSE,
+                  box = FALSE,
+                  main = "Distribution of the estimated total water demand per pixel- 2016-2018",cex.main=0.85, adj = 0., line=-0.5)
+
+legend("bottomright",
+       legend = c("Soybeans Monocropping-3.6 ac/ft.","Primarily SB-R-3.81ac/ft.","Primarily Rice-R-4.04ac/ft.",  "Rice Monocropping-4.27ac/ft" ),
+       fill = color,
+       border = FALSE,
+       bty = "n",cex=.75,title="Crop Rotation/Total water demand ") # turn off legend border   
+#difference in water demand across time
+waterdemand<-function(x,y){return(x-y)}
+diffWU2010_2015<-overlay(WU2010_2012,WU2013_2015,fun=waterdemand)
+diffWU2016_2018<-overlay(WU2013_2015,WU2016_2018,fun=waterdemand)
+#remove the zeros
+diffWU2010_2015[diffWU2010_2015 == 0] <- NA
+diffWU2016_2018[diffWU2016_2018 == 0] <- NA
+plot(diffWU2010_2015)
+summary(diffWU2010_2015)
+color=c("blue", "pink","green", "red" )
+#Total water demand
+cuts=c( -0.227649,-0.07589,0.07589,0.227649) #set breaks
+
+plot2019<-plot(diffWU2016_2018,
+               legend = F,
+               col = color, axes = FALSE,
+               box = FALSE,
+               main = "Distribution of the estimated total water demand per pixel- 2010-2019",cex.main=0.85, adj = 0., line=-0.5)
+#2010-2012
+legend("bottomright",
+       legend = c("Soybeans Monocropping-3.6 ac/ft.","Primarily SB-R-3.81ac/ft.","Primarily Rice-R-4.04ac/ft.",  "Rice Monocropping-4.27ac/ft" ),
+       fill = color,
+       border = FALSE,
+       bty = "n",cex=.75,title="Crop Rotation/Total water demand ") # turn off legend border   
+# Crop Frequency
+ARBrisk<-brick(AR_classified2010_c,AR_classified2011_c,AR_classified2012_c,AR_classified2014_c,AR_classified2015_c,
+               AR_classified2016_c,AR_classified2017_c,AR_classified2018_c,AR_classified2019_c)
+show(ARBrisk)
+reclass_df_rice<-c(4,1,
+                   6,0
+)
+reclass_m_rice <- matrix(reclass_df_rice,
+                         ncol = 2,
+                         byrow = TRUE)
+AR_rice<- reclassify(ARBrisk,
+                     reclass_m_rice  )
+show(AR_rice)
+#soybean
+reclass_df_soybean<-c(4,0,
+                      6,1
+)
+
+
+
+reclass_m_soybean <- matrix(reclass_df_soybean,
+                            ncol = 2,
+                            byrow = TRUE)
+AR_soybean<- reclassify(ARBrisk,
+                        reclass_m_soybean )
+# assign all pixels that equal 0 to NA or no data value
+show(AR_soybean)
+
+Freq_rice<-calc(AR_rice,sum)
+Freq_soybean<-calc(AR_soybean,sum)
+show(Freq_rice)
+show(Freq_soybean)
+library(RColorBrewer)
+my.palette <- c('grey', '#f7fcf5','#ffffd9','#edf8b1','#c7e9b4','#7fcdbb','#41b6c4',
+                '#1d91c0','#225ea8','#253494','#081d58')
+
+plot(Freq_rice,
+     legend = F,
+     col =my.palette, axes = FALSE,
+     box = FALSE,
+     main = )
+
+legend("bottomright",
+       legend = c("Zero Year"," One Year","Two Years","Three Years",  " four Years" ,
+                  "Five Years", "Six Years","Seven Years", "Eight Years","Nine Years","Ten Years"),
+       fill = my.palette ,
+       border = FALSE,
+       bty = "n",cex=.75,title="Rice Crop Frequency") # turn off legend border   
+soy.palette <- c('grey','light grey', '#ffffe5','#f7fcb9','#d9f0a3','#addd8e','#78c679','#41ab5d','#238443','#006837','#004529')
+plot(Freq_soybean,
+     legend = F,
+     col = soy.palette, axes = FALSE,
+     box = FALSE,
+     main = )
+
+legend("bottomright",
+       legend = c("Zero Year"," One Year","Two Years","Three Years",  " four Years" ,
+                  "Five Years", "Six Years","Seven Years", "Eight Years","Nine Years","Ten Years"),
+       fill = soy.palette,
+       border = FALSE,
+       bty = "n",cex=.75,title="Soybeans Cropping Frequency") # turn off legend border   
+
+#frequency for corn
+
+ARcorn<-brick(AR_classified2010_b,AR_classified2011_b,AR_classified2012_b,AR_classified2014_b,AR_classified2015_b,
+              AR_classified2016_b,AR_classified2017_b,AR_classified2018_b,AR_classified2019_b)
+show(ARBrisk)
+reclass_df3_corn<-c(1,0,
+                    2,1,
+                    3,0,
+                    4,0,
+                    5,0,
+                    6,0,
+                    7,0
+)
+reclass_m3_corn <- matrix(reclass_df3_corn,
+                          ncol = 2,
+                          byrow = TRUE)
+AR_cornR<-reclassify(AR_corn,
+                     reclass_m3_corn   )
+
+Freq_corn<-calc(AR_cornR,sum)
+my.palette <- c('grey', '#ffffe5','#fff7bc','#fee391','#fec44f','#fe9929','#ec7014','#cc4c02','#993404','#662506')
+
+plot(Freq_corn,
+     legend = F,
+     col =my.palette, axes = FALSE,
+     box = FALSE,
+     main = )
+
+legend("bottomright",
+       legend = c("Zero Year"," One Year","Two Years","Three Years",  " four Years" ,
+                  "Five Years", "Six Years","Seven Years", "Eight Years","Nine Years","Ten Years"),
+       fill = my.palette ,
+       border = FALSE,
+       bty = "n",cex=.75,title="Corn Cropping Frequency") # turn off legend border   
+##frequency for cotton
+
+ARcorn<-brick(AR_classified2010_b,AR_classified2011_b,AR_classified2012_b,AR_classified2014_b,AR_classified2015_b,
+              AR_classified2016_b,AR_classified2017_b,AR_classified2018_b,AR_classified2019_b)
+show(ARBrisk)
+reclass_df3_cotton<-c(1,0,
+                      2,0,
+                      3,1,
+                      4,0,
+                      5,0,
+                      6,0,
+                      7,0
+)
+reclass_m3_cotton <- matrix(reclass_df3_cotton,
+                            ncol = 2,
+                            byrow = TRUE)
+AR_cotton<-reclassify(AR_corn,
+                      reclass_m3_cotton )
+
+Freq_cotton<-calc(AR_cotton,sum)
+my.palette <- c('grey', '#fcfbfd','#efedf5','#dadaeb','#bcbddc','#9e9ac8','#807dba','#6a51a3','#54278f','#3f007d')
+
+plot(Freq_cotton,
+     legend = F,
+     col =my.palette, axes = FALSE,
+     box = FALSE,
+     main = )
+
+legend("bottomright",
+       legend = c("Zero Year"," One Year","Two Years","Three Years",  " four Years" ,
+                  "Five Years", "Six Years","Seven Years", "Eight Years","Nine Years","Ten Years"),
+       fill = my.palette ,
+       border = FALSE,
+       bty = "n",cex=.75,title="Cotton Cropping Frequency") # turn off legend border   
+#sequence of rotation
+
+year_2010<-1000000000
+year_2011<-100000000
+year_2012<-10000000
+year_2013<-1000000
+year_2014<-100000
+year_2015<-10000
+year_2016<-1000
+year_2017<-100
+year_2018<-10
+year_2019<-1
+
+yr_ar_10 <-AR_classified2010_c * year_2010
+yr_ar_11 <- AR_classified2011_c * year_2011
+yr_ar_12 <-AR_classified2012_c * year_2012
+yr_ar_13 <- AR_classified2013_c * year_2013
+yr_ar_14 <-AR_classified2014_c * year_2014
+yr_ar_15 <- AR_classified2015_c * year_2015
+yr_ar_16 <-AR_classified2016_c * year_2016
+yr_ar_17 <- AR_classified2017_c * year_2017
+yr_ar_18 <-AR_classified2018_c * year_2018
+yr_ar_19 <- AR_classified2019_c * year_2019
+all_ar <-yr_ar_13+yr_ar_14+yr_ar_15+ yr_ar_16+ yr_ar_17+
+  yr_ar_18 + yr_ar_19+yr_ar_10+yr_ar_11+yr_ar_12
+
+plot(all_ar)
+
+#top 6crops
+
+
+
+
+yr_ar_10 <-AR_classified2010_b * year_2010
+yr_ar_11 <- AR_classified2011_b * year_2011
+yr_ar_12 <-AR_classified2012_b * year_2012
+yr_ar_13 <- AR_classified2013_b * year_2013
+yr_ar_14 <-AR_classified2014_b * year_2014
+yr_ar_15 <- AR_classified2015_b * year_2015
+yr_ar_16 <-AR_classified2016_b * year_2016
+yr_ar_17 <- AR_classified2017_b * year_2017
+yr_ar_18 <-AR_classified2018_b * year_2018
+yr_ar_19 <- AR_classified2019_b * year_2019
+all_ar <-yr_ar_13+yr_ar_14+yr_ar_15+ yr_ar_16+ yr_ar_17+
+  yr_ar_18 + yr_ar_19+yr_ar_11+yr_ar_12
+
+plot(all_ar)
+
+Count<-freq(all_ar)
+view(Count)
+mapview(all_ar)
+show(all_ar)
+
+​
