@@ -120,14 +120,14 @@ IDW<-function(year, var_type){
    mean(rmse)
   
   
-  write.csv(rmse, paste("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster/RMSE_",var_type, year,".csv"), row.names = T)
+  write.csv(rmse, paste("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/Well_Data/Result_raster/raster_IDW_county/RMSE_",var_type, year,".csv"), row.names = T)
   
   
-  writeRaster(idwr, paste0("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster/IDW_",var_type, year, ".tif"),  overwrite = T) 
+  writeRaster(idwr, paste0("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/Well_Data/Result_raster/raster_IDW_county/IDW_",var_type, year, ".tif"),  overwrite = T) 
   
   
 }
-
+Well_Data/Result_raster/
 
 #--- run the above code in parallel ---#
 future_lapply(
@@ -232,22 +232,21 @@ IDW<-function(year, var_type){
   mean(rmse)
   
   
-  write.csv(rmse, paste("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster_huc12/RMSE_",var_type, year,".csv"), row.names = T)
-  writeRaster(idwr, paste0("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster_huc12/IDW_",var_type, year, ".tif"),  overwrite = T) 
+  write.csv(rmse, paste("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/Well_Data/Result_raster/raster_IDW_huc12/RMSE_",var_type, year,".csv"), row.names = T)
+  writeRaster(idwr, paste0("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/Well_Data/Result_raster/raster_IDW_huc12/IDW_",var_type, year, ".tif"),  overwrite = T) 
   
   
 }
 
 
-#--- run the above code in parallel ---#
+
 future_lapply(
   2010:2019,
   function (x) IDW(x, "Fall")
 )
 
 
-ab<-raster("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster_huc12/IDW_Fall2011.tif " )
-plot(ab)
+
 
 
 future_lapply(
@@ -330,7 +329,9 @@ plot(ok)
 
 
 #cross-validation
-
+RMSE <- function(observed, predicted) {
+  sqrt(mean((predicted - observed)^2, na.rm=TRUE))
+}
 library(dismo)
 nfolds <- 5
 k <- kfold(aq, nfolds)
@@ -347,8 +348,8 @@ for (i in 1:nfolds) {
  krigrmse
  krigrmse <- mean(krigrmse)
  
- write.csv(krigrmse, paste("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster_krig/RMSE_",var_type, year,".csv"), row.names = T)
- writeRaster(ok, paste0("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster_krig/krig_",var_type, year, ".tif"),  overwrite = T) 
+ write.csv(krigrmse, paste("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/Well_Data/Result_raster/raster_krig_county/RMSE_",var_type, year,".csv"), row.names = T)
+ writeRaster(ok, paste0("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/Well_Data/Result_raster/raster_krig_county/krig_",var_type, year, ".tif"),  overwrite = T) 
  
 }
  
@@ -440,7 +441,9 @@ Krige_huc<-function(year, var_type){
   
   
   #cross-validation
-  
+  RMSE <- function(observed, predicted) {
+    sqrt(mean((predicted - observed)^2, na.rm=TRUE))
+  }
   library(dismo)
   nfolds <- 5
   k <- kfold(aq, nfolds)
@@ -457,8 +460,8 @@ Krige_huc<-function(year, var_type){
   krigrmse
   krigrmse <- mean(krigrmse)
   
-  write.csv(krigrmse, paste("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster_krig_huc12/RMSE_",var_type, year,".csv"), row.names = T)
-  writeRaster(ok, paste0("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster_krig_huc12/krig_",var_type, year, ".tif"),  overwrite = T) 
+  write.csv(krigrmse, paste("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/Well_Data/Result_raster/raster_krig_huc12/RMSE_",var_type, year,".csv"), row.names = T)
+  writeRaster(ok, paste0("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/Well_Data/Result_raster/raster_krig_huc12/krig_",var_type, year, ".tif"),  overwrite = T) 
   
 }
 
@@ -483,21 +486,5 @@ future_lapply(
 )
 
 
-#times plot
-Fall2010<-raster("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster/IDW_Fall2010.tif ")
-Fall2011<-raster("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster/IDW_Fall2011.tif ")
-Fall2012<-raster("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster/IDW_Fall2012.tif ")
-Fall2013<-raster("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster/IDW_Fall2013.tif ")
-Fall2014<-raster("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster/IDW_Fall2014.tif ")
-Fall2015<-raster("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster/IDW_Fall2015.tif ")
-Fall2016<-raster("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster/IDW_Fall2016.tif ")
-Fall2017<-raster("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster/IDW_Fall2017.tif ")
-Fall2018<-raster("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster/IDW_Fall2018.tif ")
-Fall2019<-raster("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/raster/IDW_Fall2019.tif ")
 
-Fall_well<-Fall2019-Fall2010
-plot.new()
-values <- click(Fall_well, n=1)
-timeseries <- data.frame(year = c(2010, 2019),
-                         values = values[1, ])
 
