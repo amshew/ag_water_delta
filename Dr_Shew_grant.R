@@ -23,15 +23,11 @@ pacman::p_load(
   future.apply, # parallel processing
   CropScapeR, # download CDL data
   prism,
-  rgal# download PRISM data
+  rgal,
+  foreach,
+  rgeos # download PRISM data
 )   
-library(sf)
-library(pacman)
-library(cdlTools)
-library(prism)
-library(rgdal)
-library(raster)
-library(dplyr)
+
 #code starts here
 # the end bound
 memory.limit(size=1000000)
