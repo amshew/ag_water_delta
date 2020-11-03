@@ -64,23 +64,23 @@ memory.limit(size=100000)
 ######Download CDL*******************#
 
 (
-  AR_cdl<- getCDL(5, 2009:2019,location="C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/cdl")
+  AR_cdl<- getCDL(5, 2004:2019,location="F:/transfer/cdl")
 )
 show( AR_cdl$AR2015)
 crs(AR_cdl$AR2015)
 projection(crs(AR_cdl$AR2015))
 
 #----Hardway---will rewrite a  simpler code later---#
-AR2010 <-raster("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/cdl/CDL_2010_05.tif") 
-AR2011 <-raster("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/cdl/CDL_2011_05.tif") 
-AR2012 <-raster("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/cdl/CDL_2012_05.tif") 
-AR2013 <-raster("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/cdl/CDL_2013_05.tif") 
-AR2014 <-raster("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/cdl/CDL_2014_05.tif") 
-AR2015 <-raster("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/cdl/CDL_2015_05.tif") 
-AR2016 <-raster("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/cdl/CDL_2016_05.tif") 
-AR2017 <-raster("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/cdl/CDL_2017_05.tif") 
-AR2018 <-raster("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/cdl/CDL_2018_05.tif") 
-AR2019 <-raster("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/cdl/CDL_2019_05.tif")
+AR2010 <-raster("F:/transfer/cdl/CDL_2010_05.tif") 
+AR2011 <-raster("F:/transfer/cdl/CDL_2011_05.tif") 
+AR2012 <-raster("F:/transfer/cdl/CDL_2012_05.tif") 
+AR2013 <-raster("F:/transfer/cdl/CDL_2013_05.tif") 
+AR2014 <-raster("F:/transfer/cdl/CDL_2014_05.tif") 
+AR2015 <-raster("F:/transfer/cdl/CDL_2015_05.tif") 
+AR2016 <-raster("F:/transfer/cdl/CDL_2016_05.tif") 
+AR2017 <-raster("F:/transfer/cdl/CDL_2017_05.tif") 
+AR2018 <-raster("F:/transfer/cdl/CDL_2018_05.tif") 
+AR2019 <-raster("F:/transfer/cdl/CDL_2019_05.tif")
 library(mapview)
 #*************plot#
 plot(AR2010)
@@ -130,8 +130,10 @@ Dipo2<-function(AR,i,b){
   return(Acreage)
 }
 
-Acres<-Dipo2(AR,1,2)
+Acres<-Dipo2(AR,1,10)
 Acres
+adad=readRDS("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Acreage.rds")
+adad
 gather(Acres,key="crop", value="Acreage", Corn,Soybeans,Rice)%>%
   mutate(Acreage=Acreage/1000)%>%
   ggplot(aes(year,Acreage, color = crop))+
