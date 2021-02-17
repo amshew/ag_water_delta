@@ -37,7 +37,7 @@ AR_huc12<-readRDS("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/AR_hu
 plot(AR_huc12)
 AR_huc12_sf<-readRDS("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/AR_huc12_sf.rds")
 #--- the file name of the downloaded data ---#
-file_name <- raster("C:/Users/obemb/OneDrive/Documents/prismtmp/PRISM_ppt_stable_4kmD2_20101231_bil/PRISM_ppt_stable_4kmD2_20101231_bil.bil")
+file_name <- raster("F:/Prism_data/PRISM_ppt_stable_4kmD2_20101231_bil/PRISM_ppt_stable_4kmD2_20101231_bil.bil")
 coord<-raster::extract(file_name, SpatialPoints(AR_huc12), sp = T)%>%
   data.frame(.) %>% 
   dplyr::select(coords.x1, coords.x2)

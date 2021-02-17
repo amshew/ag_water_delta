@@ -52,7 +52,7 @@ crs(AR.Delta)
 
 #nlcd
 library(raster)
-nlcd <- raster("F:/transfer/Soil_code/NLCD_2016_Land_Cover_L48_20190424/NLCD_2016_Land_Cover_L48_20190424.img")
+nlcd <- raster("E:/transfer/Soil_code/NLCD_2016_Land_Cover_L48_20190424/NLCD_2016_Land_Cover_L48_20190424.img")
 plot(nlcd)
 show(nlcd)
 crs(nlcd )<-"+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs" 
@@ -63,7 +63,7 @@ crs(nlcd )<-"+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=
 require(rgdal)
 
 
-soil_AR<-raster("F:/transfer/Soil_code/soils_GSSURGO_ar_3847137_01/raster/MapunitRaster_10m.tif")
+soil_AR<-raster("E:/transfer/Soil_code/soils_GSSURGO_ar_3847137_01/raster/MapunitRaster_10m.tif")
 plot(soil_AR)
 show(soil_AR)
 
@@ -109,9 +109,8 @@ show(soil_Delta)
 r.new<-raster("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/r.new.tif") #saving the raster saves time.
 soil<- mask(r.new, AR_Mask, maskvalue = FALSE)
 show(soil)
-
-
-
+crs(soil)
+saveRDS( soil, file = "C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/ Soil.rds")
 #re-extent from  raster to polygon 
 myExtent <- spTransform(AR.Delta, CRS(proj4string(soil)))
 show(myExtent)
@@ -149,3 +148,6 @@ Elevation<- subset( Soil_data, select =c(ID, elev))
 saveRDS(
   Elevation, 
   file='C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/SW_Raw_data/Elevation_county.rds')
+
+
+

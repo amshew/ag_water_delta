@@ -130,7 +130,7 @@ get_save_prism_y <- function(temp_start_year, var_type) {
       values_to = var_type
     )  
   )
-  temp_stars <- stack(file_path) 
+  #temp_stars <- stack(file_path) 
   
   
   tmax_long$date <- str_remove_all( tmax_long$date, "PRISM_")

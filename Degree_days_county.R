@@ -24,7 +24,8 @@ pacman::p_load(
   CropScapeR, # download CDL data
   prism,
   rgal# download PRISM data
-)   
+) 
+library(tidyverse)
 library(sf)
 library(pacman)
 library(cdlTools)
@@ -34,7 +35,7 @@ library(raster)
 library(dplyr)
 #code starts here
 # the end bound
-b=38
+b=39
 year=2012
 start.time <- Sys.time()
 memory.limit(size=1000000)
@@ -74,18 +75,23 @@ library( foreach)
     e<-abs(h)
     d<-abs(c)
     f<-ifelse(c < 0,paste0("minus",sep = "",d),c)
-      weather[,paste0("dday",f,"C", sep="")] <-0
-      weather[,paste0("time",f,"C", sep="")] <-0
-      case_dd<- weather$tavg - b
-      # case 2: bound <= tMin
-      weather[,paste0("dday",f,"C", sep="")] <- ifelse( b <=  weather$tmin, case_dd , 0)
-      weather$tempSave = acos( (2*b-weather$tmax-weather$tmin)/(weather$tmax-weather$tmin) )
-      weather[,paste0("time",f,"C", sep="")] <-ifelse( b<=  weather$tmin,1, 0)
-      weather[,paste0("dday",f,"C", sep="")] <-ifelse (weather$tmin < b & b <  weather$tmax,((  weather$tavg-b)* weather$tempSave + ( weather$tmax- weather$tmin)*sin( weather$tempSave)/2)/pi, weather$tavg - b)
-      weather[,paste0("time",f,"C", sep="")] <-ifelse ( weather$tmin< b & b <  weather$tmax,(acos( (2*b-weather$tmax-weather$tmin)/(weather$tmax-weather$tmin) )/pi), 1)
-      
-      
+    #  default case 1: tMax <= bound
+    weather[,paste0("dday",f,"C", sep="")] <-0
+    weather[,paste0("time",f,"C", sep="")] <-0
+    case_dd<- weather$tavg - b
+    # case 2: bound <= tMin
+    weather[,paste0("dday",f,"C", sep="")] <- ifelse( b <=  weather$tmin, case_dd , 0)
+    
+    weather[,paste0("time",f,"C", sep="")] <-ifelse( b<=  weather$tmin,1, 0)
+    #case 3: tMin < bound < tMax
+    weather$tempSave = acos( (2*b-weather$tmax-weather$tmin)/(weather$tmax-weather$tmin) )
+    weather$tempSave[is.nan(weather$tempSave)] <- 0
+    weather[,paste0("dday",f,"C", sep="")] <-ifelse (weather$tmin < b & b <  weather$tmax,((  weather$tavg-b)* weather$tempSave + ( weather$tmax- weather$tmin)*sin( weather$tempSave)/2)/pi, 0)
+    weather[,paste0("time",f,"C", sep="")] <-ifelse ( weather$tmin< b & b <  weather$tmax,(acos( (2*b-weather$tmax-weather$tmin)/(weather$tmax-weather$tmin) )/pi), 0)
+    
+    
     weather= subset( weather, select = -c(tempSave) ) }
+    
     
     saveRDS(
       weather, 
@@ -99,7 +105,9 @@ future_lapply(
 1981:2019,
   function (x) gdd (x)
 )
-b=-10:37
+
+###Exposure
+b=-10:38
 year=1981:2019
 for(year in year){
 for(i in b){
@@ -108,18 +116,49 @@ for(i in b){
   e<-abs(h)
   d<-abs(c)
   f<-ifelse(c < 0,paste0("minus",sep = "",d),c)
+  g<-ifelse(h < 0,paste0("minus",sep = "",e),h)
   weather<-  readRDS(paste0('C:/Users/obemb/OneDrive/Documents/prismtmp/Weather Data/County/degree days/degreedays_time_', "y", year, ".rds"))
   
-  weather[,paste0("bin",f,"_",e,sep="")]<-weather[,paste0("time",f,"C", sep="")]-weather[,paste0("time",e,"C", sep="")]
+  weather[,paste0("exp",f,"C",sep="")]<-weather[,paste0("time",f,"C", sep="")]-weather[,paste0("time",g,"C", sep="")]
 }
   weather= select(weather,-starts_with("time"))
   saveRDS(
     weather, 
-    paste0('C:/Users/obemb/OneDrive/Documents/prismtmp/Weather Data/County/degree days/degreedays_', "y", year, ".rds")
+    paste0('C:/Users/obemb/OneDrive/Documents/prismtmp/Weather Data/County/degree days/degreedays_exp_', "y", year, ".rds")
   )
   unlink(  paste0('C:/Users/obemb/OneDrive/Documents/prismtmp/Weather Data/County/degree days/degreedays_time_', "y", year, ".rds"), recursive = TRUE)
 }
+print(paste0("time",g,"C", sep=""))
 
+####Temperature Bins
+
+
+
+  
+b=seq(from =0, to = 36, by = 3)
+     
+     
+    
+year=1981:2019
+for(year in year){
+for(i in b){
+  print(b)
+    c<-b
+    h<-b+1
+    k=b+2
+    weather<-  readRDS(paste0('C:/Users/obemb/OneDrive/Documents/prismtmp/Weather Data/County/degree days/degreedays_exp_', "y", year, ".rds"))
+    weather[,paste0("bin",c,"_",k,sep="")]<- weather[,paste0("exp",c,"C", sep="")]+weather[,paste0("exp",h,"C", sep="")]+weather[,paste0("exp",k,"C", sep="")]
+  
+    #weather$binminus10_minus1=apply( weather[60: 69],1,sum)
+    }
+
+  weather= select(weather,-starts_with("exp"))
+  saveRDS(
+    weather, 
+    paste0('C:/Users/obemb/OneDrive/Documents/prismtmp/Weather Data/County/degree days/degreedays_', "y", year, ".rds")
+  )
+  unlink(  paste0('C:/Users/obemb/OneDrive/Documents/prismtmp/Weather Data/County/degree days/degreedays_exp_', "y", year, ".rds"), recursive = TRUE)
+}
 DDays<-'C:/Users/obemb/OneDrive/Documents/prismtmp/Weather Data/County/degree days'
 DDays_panel<-list.files(DDays,
                         full.names = T,

@@ -55,6 +55,8 @@ colnames(DTW)
 DTW$COUNTYFP10<- as.numeric(as.character(DTW$COUNTYFP10))
 #return
 Return<-read.csv("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Return/Crop_Return.csv")
+#colnames(Return)[3]<- "Soy_Return"
+#colnames(Return)[4]<- "Rice_Return"
 head(Return)
 Return=Return[Return$Year >= "2006" &Return$Year<= "2019",]
 colnames(Return)
@@ -62,12 +64,12 @@ colnames(Return)
 cost_share<-readRDS('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/IWM/IWM_cost_county_subsidy_bundle.rds')
 
 
-Rice_acreageshare<-  readRDS('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/County/CDL/CDL_3_.rds')%>%
-  subset( ., select = -c( CDL_Code))
-Rice_acreageshare$COUNTYFP10<- as.numeric(as.character(Rice_acreageshare$COUNTYFP10))
-Rice_cost<-merge(Rice_acreageshare ,cost_share, by=c("COUNTYFP10" =  "COUNTYFP10","Year"= "Year"),sort = TRUE)
-Rice_cost$COUNTYFP10<- as.numeric(as.character(Rice_cost$COUNTYFP10))
-Rice<-merge(Rice_cost ,Return, by=c("COUNTYFP10" =  "COUNTYFP10", "Year"= "Year","fips"= "fips"),sort = TRUE)
+Rice_acreagetran<-  readRDS('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/lu_panel_county_mon.rds')%>%
+  subset( ., select = -c(County))
+Rice_acreagetran$COUNTYFP10<- as.numeric(as.character(Rice_acreagetran$COUNTYFP10))
+Rice_cost<-merge(Rice_acreagetran ,cost_share, by=c("COUNTYFP10" =  "COUNTYFP10", "Year"= "Year"),sort = TRUE)
+
+Rice<-merge(Rice_cost ,Return, by=c("COUNTYFP10" =  "COUNTYFP10", "Year"= "Year","fips"="fips"),sort = TRUE)
 #merge with DTW
 Rice=merge(Rice,DTW, by=c("COUNTYFP10" =  "COUNTYFP10", "Year"= "Year"),sort = TRUE)
 
@@ -92,7 +94,7 @@ Weather[,paste0("dd","8","_","32","C", sep="")]<-Weather$dday8C-Weather$dday32C
 Weather[,paste0("dd","32","C", sep="")]<-Weather$dday32C
 Weather<-subset(Weather, month>=3 & month<=5)%>%subset( ., select = -c(NAME10))
 Weather<-select(Weather,-starts_with("dday"))
-Weather<- select(Weather,-starts_with("bin"))
+#Weather<- select(Weather,-starts_with("bin"))
 
 Weather<-Weather%>%group_by(ID, date, COUNTYFP10) %>%summarise_all(mean)
 colnames(Weather)
@@ -101,32 +103,56 @@ Weather$COUNTYFP10<- as.numeric(as.character(Weather$COUNTYFP10))
 Weather1<-Weather%>%group_by(ID, COUNTYFP10,Year) %>%summarise_at(vars(vpd,ET0,tmax,tmin,tavg, dd8_32C,dd32C), mean)
 Weather2<-Weather%>%group_by(ID, Year) %>%summarise_at(vars(ppt), sum)
 Weather_year<-merge(Weather1,Weather2,by=c("ID","Year"),sort = TRUE)
-Weather_Soil_data<-merge(Weather_year,Soil_data,by=c("ID"),sort = TRUE)
-Data<-merge(Rice,Weather_Soil_data,by=c("Year","COUNTYFP10","ID"),sort = TRUE)%>%mutate(.,t=Year-2005)%>%subset( ., select = -c(County))
-colnames(Data)[8]<- "County"
 
-write.csv(Data, file="C:/Users/obemb/OneDrive/Desktop/data/Code/STATA/prices/Data_county.csv", row.names = FALSE)
+Weather_Soil_data<-merge(Weather_year,Soil_data,by=c("ID"),sort = TRUE)
+Data<-merge(Rice,Weather_Soil_data,by=c("Year","COUNTYFP10","ID"),sort = TRUE)%>%mutate(.,t=Year-2005)
+
+write.csv(Data, file="C:/Users/obemb/OneDrive/Desktop/data/Code/STATA/prices/Data_county_freq.csv", row.names = FALSE)
 colnames(Data)
 Data<-Data%>%mutate(.,logTotal=log(Total))
-Data$Total<-Data$Total/1000
+Data$Total<-Data$Total
 Data<-Data%>%mutate(.,lagTotal=lag(logTotal,1))
-Data<-Data%>%mutate(.,Totaldtw=logTotal*cv)
+Data<-Data%>%mutate(.,Totaldtw=Total*dtw)
 
+summary(Data$Rice_Return)
 summary(Data$Total)
 summary(Data$logTotal)
-summary(Data$share)
 library(plm)
 library(lmtest)
 library(sandwich)
-linearMod <- plm(share ~ppt+ Total+soybean_return_fut +rice_return_fut,data=Data, model = "within")
+
+linearMod <- plm(share_freq~  ppt+tavg+ Total+soybean_return_fut +rice_return_fut,data=Data, model = "within",index = "COUNTYFP10")
 summary(linearMod)
 coeftest(linearMod, vcov=vcovHC(linearMod,type="HC0",cluster="group",vcov = vcovHC))
-linearMod <- plm(share ~  ppt+tavg+   logTotal+Totaldtw+Soy_Return +Rice_Return,data=Data, model = "within")
+linearMod <- plm(share_freq ~  ppt+tmin +tmax+ Total+soybean_return_fut +rice_return_fut,data=Data, model = "within",index = "COUNTYFP10")
 summary(linearMod)
+coeftest(linearMod, vcov=vcovHC(linearMod,type="HC0",cluster="group",vcov = vcovHC))
 
-#glm 
-linearMod <- glm(Share ~ppt+tavg+ Total+soybean_return_fut +rice_return_fut,data=Data,family = binomial)
+
+
+
+linearMod <- plm(share_freq ~  ppt+tavg+ Total+Crop_Return_fut +rice_return_fut,data=Data, model = "within")
 summary(linearMod)
+coeftest(linearMod, vcov=vcovHC(linearMod,type="HC0",cluster="group",vcov = vcovHC))
+linearMod <- plm(share_freq ~ ppt+tavg+   Total+dtw+Crop_Return_fut +rice_return_fut,data=Data, model = "within")
+summary(linearMod)
+coeftest(linearMod, vcov=vcovHC(linearMod,type="HC0",cluster="group",vcov = vcovHC))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 library(lmtest)
 linearMod <- plm(Share ~  ppt+ET0++   logTotal+Totaldtw+Soy_Return +Rice_Return,data=Data, model = "within")

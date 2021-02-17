@@ -1,5 +1,3 @@
-
-# clear and set wd ----
 rm(list=ls()) # Caution: this clears the Environment
 
 
@@ -49,7 +47,7 @@ AR.Delta <- AR[as.character(AR@data$NAME10) %in% nestates, ]
 plot(AR.Delta)
 
 #re-extent from polygon to raster
-AR2010 <-raster("F:/transfer/cdl/CDL_2010_05.tif") 
+AR2010 <-raster("E:/transfer/cdl/CDL_2010_05.tif") 
 myExtent <- spTransform(AR.Delta, CRS(proj4string(AR2010)))
 show(myExtent)
 AR_Mask <-readRDS("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/AR_Mask.rds")
@@ -71,11 +69,11 @@ coord <- readRDS('C:/Users/obemb/OneDrive/Documents/prismtmp/Weather Data/coord_
 plot(myExtent)
 library(parallel)
 num_cores <- detectCores() 
-
+year=2010
 plan(multiprocess, workers = num_cores)
-year<-2012
+year<-2008
 share_crop<-function(year){
-  folder_name <- paste0("F:/transfer/cdl") 
+  folder_name <- paste0("E:/transfer/cdl") 
   print(folder_name)
   #--- the file name of the downloaded data ---#
   file_name <- paste0("CDL","_",year,"_","05",".tif") 
@@ -84,50 +82,58 @@ share_crop<-function(year){
   
   Data <-raster(paste0( folder_name,"/", file_name))
   print(Data)
-Data_AR<-  crop(Data, extent(myExtent)) 
-#extent(Data_AR)
-#extent(AR_Mask)
-Data_AR_crop<-crop ( AR_Mask,Data_AR ) #crop to get the same extent
-Data_AR_mask<- mask (Data_AR,Data_AR_crop)
-#plot(Data_AR_mask)
-Data_extract<- raster::extract(Data_AR_mask,myExtent, 
-                               progress = F,
-                                    cellnumbers=TRUE,   df=T,na.rm =T)%>% 
-              drop_na() # drop the NA that represent the  masked area to zero then drop them before calculation share
-
-
-
-#colnames(Data_extract)
-colnames(Data_extract)[3] <- "CDL_Code"
-colnames(Data_extract)[2] <- "Count"
-colnames(Data_extract)
-
-Data_extract_sub<-Data_extract[!(Data_extract$CDL_Code ==195 | Data_extract$CDL_Code ==190|Data_extract$CDL_Code ==176),]
-
-#NLCD fails to mask wetwoods-195,190 and grassland and pasture-176
-Data_extract_count<-Data_extract_sub%>%group_by(ID,CDL_Code)%>%summarise(count= n())%>% 
-  within(., {sum = ave(count,ID,FUN=sum)} )%>%mutate( .,Acreage=0.222394*sum)%>%mutate( .,Crop_Acre=0.222394*count)%>%
-  mutate( .,Share=count/sum) %>%subset( ., select = -c(count,sum))%>%
-  merge(.,coord,  by=c("ID"),sort = TRUE)%>% 
-  mutate (.,Year=year)
-
-
-
-
-saveRDS(
-  Data_extract_count, 
-  paste0('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/County/Crop_share_', "y", year, '.rds')
+  Data_AR<-  crop(Data, extent(myExtent)) 
+  extent(Data_AR)
+  extent(AR_Mask)
+  Data_AR_crop<-crop ( AR_Mask,Data_AR ) #crop to get the same extent
+  extent( Data_AR_crop)
+  Data_AR_mask<- mask (Data_AR,Data_AR_crop)
+  #plot(Data_AR_mask)
+  
+  memory.limit(size=10000000) 
+  Data_extract<- raster::extract(Data_AR_mask,myExtent, 
+                                 progress = F,
+                                 cellnumbers=TRUE,   df=T,na.rm =T)%>% 
+    drop_na() # drop the NA that represent the  masked area to zero then drop them before calculation share
+  
+  
+  
+  #colnames(Data_extract)
+  colnames(Data_extract)[3] <- "CDL_Code"
+  colnames(Data_extract)[2] <- "Count"
+  colnames(Data_extract)
+ 
+  Data_extract_sub<-Data_extract[!(Data_extract$CDL_Code ==195 | Data_extract$CDL_Code ==190|Data_extract$CDL_Code ==176),]
+  
+  #NLCD fails to mask wetwoods-195,190 and grassland and pasture-176
+  Data_extract_count<-Data_extract_sub%>%group_by(ID,CDL_Code)%>%summarise(count= n())
+  tmp <- tapply(Data_extract_count$count, Data_extract_count$ID, sum) #Obtains sums by ID
+  Data_extract_count$sum <- tmp[ Data_extract_count$ID] 
+  Data_extract_count=Data_extract_count%>%
+  mutate( .,Acreage=0.222394*sum)%>% mutate( .,share=count/sum)%>%mutate( .,Crop_Acre=0.222394*count)%>%subset( ., select = -c(count,sum))%>%
+    merge(.,coord,  by=c("ID"),sort = TRUE)%>% 
+    mutate (.,Year=year)%>%subset( ., select = -c(latitude,longitude))
+  
+  
+  
+  
+  saveRDS(
+    Data_extract_count, 
+    paste0('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/County/Crop_share_', "y", year, '.rds')
   )
-  }
+}
 
-
+future_lapply(
+  2008:2019,
+  function (x) share_crop(x)
+)
 library(parallel)
 num_cores <- detectCores() 
 
 plan(multiprocess, workers = num_cores)
+  year<-2006
+share_crop<-function(year){
 
-share_crop<-function(year)
-year<-2006
 folder_name <- paste0("F:/transfer/cdl") 
 print(folder_name)
 #--- the file name of the downloaded data ---#
@@ -138,16 +144,22 @@ print(file_name)
 Data <-raster(paste0( folder_name,"/", file_name))
 print(Data)
 
-#Data_AR_crop<-crop (AR.Delta ,Data_AR ) #crop to get the same extent
-Data_AR<-  crop(Data, extent(myExtent)) 
+
+Data <-raster(paste0( folder_name,"/", file_name))
+print(Data)
+if(year==2006|year==2007) { r.new = resample(Data,AR2010,method= 'ngb')
+}
+
+#show(r.new)
+Data_AR<-  crop(r.new, extent(myExtent)) 
 #extent(Data_AR)
 #extent(AR_Mask)
-Data_AR_crop<-crop ( Data_AR,AR_Mask ) #crop to get the same extent
-r.new = resample(Data_AR_crop,AR_Mask,method= 'ngb')
+Data_AR_crop<-crop ( AR_Mask,Data_AR ) #crop to get the same extent
+extent(Data_AR_crop)
+Data_AR_mask<- mask (Data_AR,Data_AR_crop)
+#extent( Data_AR_mask)  
 
 
-
-Data_AR_mask<- mask (r.new, AR_Mask)
 #plot(Data_AR_mask)
 Data_extract<- raster::extract(Data_AR_mask,myExtent, 
                                progress = F,
@@ -164,11 +176,13 @@ colnames(Data_extract)
 Data_extract_sub<-Data_extract[!(Data_extract$CDL_Code ==0 |Data_extract$CDL_Code ==195 | Data_extract$CDL_Code ==190|Data_extract$CDL_Code ==176),]
 
 #NLCD fails to mask wetwoods-195,190 and grassland and pasture-176
-Data_extract_count<-Data_extract_sub%>%group_by(ID,CDL_Code)%>%summarise(count= n())%>% 
-  within(., {sum = ave(count,ID,FUN=sum)} )%>%mutate( .,Acreage=0.222394*sum)%>%mutate( .,Crop_Acre=0.222394*count)%>%
-  mutate( .,Share=count/sum) %>%subset( ., select = -c(count,sum))%>%
+Data_extract_count<-Data_extract_sub%>%group_by(ID,CDL_Code)%>%summarise(count= n())
+tmp <- tapply(Data_extract_count$count, Data_extract_count$ID, sum) #Obtains sums by ID
+Data_extract_count$sum <- tmp[ Data_extract_count$ID] 
+Data_extract_count=Data_extract_count%>%
+  mutate( .,Acreage=0.222394*sum)%>% mutate( .,share=count/sum)%>%mutate( .,Crop_Acre=0.222394*count)%>%subset( ., select = -c(count,sum))%>%
   merge(.,coord,  by=c("ID"),sort = TRUE)%>% 
-  mutate (.,Year=year)
+  mutate (.,Year=year)%>%subset( ., select = -c(latitude,longitude))
 
 
 
@@ -177,22 +191,22 @@ saveRDS(
   Data_extract_count, 
   paste0('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/County/Crop_share_', "y", year, '.rds')
 )
-
-
+}
 future_lapply(
   2006:2007,
   function (x) share_crop(x)
 )
+
 #append all the data
 share_crop<-"C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/County"
 share_crop_panel<-list.files(share_crop,
                              full.names = T,
                              pattern=".rds$")
 all.the.data <- lapply( share_crop_panel,  readRDS)
-share_crop_panelcounty<- do.call("rbind", all.the.data)
+share_crop_panel_county<- do.call("rbind", all.the.data)
 
 saveRDS(
-  share_crop_panelcounty, 
+  share_crop_panel_county, 
   file='C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/County/share_crop_panel_county.rds')
 
 
@@ -225,5 +239,4 @@ afa<-readRDS('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_sha
 
 # 2006-2007
 #resampling using the nearest neighbor from 30-(soil_Delta) to 56-(nlcd) using nearest neighbor
-
 

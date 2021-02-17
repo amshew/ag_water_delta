@@ -374,7 +374,7 @@ BG_analy_base<-BG_analy%>%group_by(anomaly2,Year)%>%summarise(count= n())
 
 
 
-BG_analy_30=BG_analy_30%>%mutate( .,  ChaBGe=ifelse(anomaly>=1,count,0))%>%within(., {total = ave(count,Year,FUN=sum)} )%>%within(., {total_c = ave(ChaBGe,Year,FUN=sum)} )%>%
+BG_analy_30=BG_analy_30%>%mutate( .,  Change=ifelse(anomaly>=1,count,0))%>%within(., {total = ave(count,Year,FUN=sum)} )%>%within(., {total_c = ave(ChaBGe,Year,FUN=sum)} )%>%
   mutate( .,per_chaBGe=100*total_c/total)%>%mutate( .,count_change=100*count/total)
 BG_analy_base=BG_analy_base%>%mutate( .,  ChaBGe=ifelse(anomaly2>=1,count,0))%>%within(., {total = ave(count,Year,FUN=sum)} )%>%within(., {total_c = ave(ChaBGe,Year,FUN=sum)} )%>%
   mutate( .,per_chaBGe=100*total_c/total)%>%mutate( .,count_change=100*count/total)

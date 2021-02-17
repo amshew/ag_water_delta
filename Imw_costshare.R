@@ -37,8 +37,18 @@ memory.limit(size=100000)
 setwd("C:/Users/obemb/OneDrive/Desktop/data/hydrologic_units_WBDHU8_ar_2521302_01/hydrologic_units")
 list.files()
 loadfonts(quiet = T)
+AR<- readOGR("C:/Users/obemb/OneDrive/Desktop/data/tl_2010_05_county10/tl_2010_05_county10.shp",
+             stringsAsFactors = FALSE)
+plot(AR)
+nestates <-c("Arkansas","Chicot","Clay","Craighead","Desha","Drew","Greene","Lee","Mississippi","Monroe",
+             "Phillips","Poinsett","St. Francis","Jackson","Lawrence", "Jefferson","Lonkoke","Crittenden","Woodruff",
+             "Prairie","Randolph","White","Pulaski","Lincoln","Ashley","Cross","Lonoke")
+AR.Delta <- AR[as.character(AR@data$NAME10) %in% nestates, ]
 
+plot(AR.Delta)
 
+AR.Delta_d<-aggregate(AR.Delta, dissolve = TRUE)
+shapefile(x = AR.Delta_d, file = "C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/AR_delta shapefile/AR.Delta_d.shp")
 library(rgeos)
 AR_huc12 <- gIntersection(HUC12, AR.Delta_d, byid=TRUE)
 library(raster)

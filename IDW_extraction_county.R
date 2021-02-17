@@ -49,22 +49,9 @@ AR.Delta <- AR[as.character(AR@data$NAME10) %in% nestates, ]
 #dissolve shapefile
 #AR.Delta_d<-aggregate(AR.Delta, dissolve = TRUE)
 plot(AR.Delta)
-Well_reading<-read_xlsx("C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/Alluvial_siteWI.xlsx")%>%subset( ., select = -c(Agency_Cod,Site_Numbe,Station_Na,Measurem_1, WL_Time_Da, WL_Time__1, Level_Type,
-                          WL_Below_M,WLBMP_Sequ,WL_Above_S,WLASL_Datu,WL_Accurac,WL_Status,Equipment,
-                          WL_Method,WL_Statist,WL_Source,WL_Party__,WL_Sourc_1,Level_Web,Remarks__C))
-
-
-colnames(Well_reading)
-colnames(Well_reading)[1]<-"latitude"
-colnames(Well_reading)[2]<-"longitude"
-colnames(Well_reading)[4]<-"well_depth"
-colnames(Well_reading)[3]<-"date"
-Well_reading$Year <-as.numeric( format(as.Date(Well_reading$date), format = "%Y"))
-Well_reading$month <- as.numeric(format(as.Date(Well_reading$date), format = "%m"))
-Well_reading<-Well_reading%>%mutate(.,season=ifelse(month<7,"Spring","Fall"))
-saveRDS(
-  Well_reading, 
-  file='C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/DTW/DTW_panel/Well_reading.rds')
+AR2010 <-raster("F:/transfer/cdl/CDL_2010_05.tif") 
+myExtent <- spTransform(AR.Delta, CRS(proj4string(AR2010)))
+show(myExtent)
 
 
 library(parallel)
@@ -72,57 +59,41 @@ num_cores <- detectCores()
 
 plan(multiprocess, workers = num_cores)
 
-year=2010
+start_date=2010
 var_type<-"Spring"
 #IDW at HUC 12
 
-IDW<-function(year, var_type){
+IDW<-function(start_date, var_type){
 
-  Data<-readRDS('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/DTW/DTW_panel/Well_reading.rds')
-  #head(Data) 
-  Data<-subset(Data, Year==year &season==var_type)%>%subset( ., select = -c(Year,date,month,season))
-  #head(Data) 
   
+  #--- end date ---#
+  #end_date <- dmy(paste0("1/1/",  temp_start_year + 1)) - 1
+  end_date <-    start_date+1
+  end_date
+  #--- list of dates of the working month-year ---#
+  year <- seq(start_date, end_date) 
+  year
+  folder_name <- paste0("raster_krig")
+  print(folder_name)
+  #--- the file name of the downloaded data ---#
+  file_name <- paste0("krig_",var_type, year,".tif") 
+  print(file_name) 
+  file_path <- paste0('C:/Users/obemb/OneDrive/Desktop/data/Data/well_data/Water_depth/Well_Data/Result_raster/', folder_name, "/", file_name)
+  file_path
   
-  
-  dsp <- SpatialPoints(Data[,2:1], proj4string=CRS("+proj=longlat +datum=NAD83"))
-  dsp <- SpatialPointsDataFrame(dsp,Data)
-  summary(dsp$well_depth)
-  
-  cuts <- c(0,60,100,140,200,280)
-  blues <- colorRampPalette(c('yellow', 'orange', 'blue', 'dark blue'))
-  pols <- list("sp.polygons", AR.Delta, fill = "lightgray")
-  
-  plot(AR.Delta)
-  spplot(dsp, 'well_depth', cuts=cuts, col.regions=blues(5), sp.layout=pols, pch=20, cex=2)
-  TA <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +datum=NAD83 +units=km +ellps=GRS80 +towgs84=0,0,0")
-  
-  dta <- spTransform(dsp,TA)
-  cata <- spTransform(AR.Delta, TA)
-  
-  v <- voronoi(dta)
-  #plot(v)
-  ca <- aggregate(cata)
-  vca <-raster::intersect(v, ca)
-  spplot(vca, 'well_depth', col.regions=rev(get_col_regions()))
-  r <- raster(cata, res=1) 
-  vr <- rasterize(vca, r,field=vca@data[["well_depth"]])
-  plot(vr)
-  gs <- gstat(formula=well_depth~1, locations=dta)
-  idw <- interpolate(r, gs)
-  ## [inverse distance weighted interpolation]
+  #--- combine all the PRISM files as a RasterStack ---#
+  temp_stars <- stack(file_path) 
+  show(temp_stars)
   
   #re-extent from polygon to raster
-  myExtent <- spTransform(AR.Delta, CRS(proj4string( idw)))
-  #show(myExtent)
-  idwr <- mask(idw, vr)
-  Data_extract<-data.frame(raster::extract(  idwr,myExtent, 
+
+  Data_extract<-data.frame(raster::extract(temp_stars,myExtent, 
                                             progress = F,
-                                            fun=mean,   sp=T,na.rm =T))%>%  
+                                            fun=mean,   sp=T,na.rm =T)) %>%  
     subset( ., select = -c(COUNTYNS10, GEOID10,NAME10,NAMELSAD10, LSAD10,
                            CLASSFP10, MTFCC10, CSAFP10, CBSAFP10, METDIVFP10,FUNCSTAT10,ALAND10,
-                           AWATER10,  INTPTLAT10,   INTPTLON10))%>% mutate(., year=year)%>%
-    subset( ., select = -c(STATEFP10))
+                           AWATER10,  INTPTLAT10,   INTPTLON10))%>%
+    subset( ., select = -c(STATEFP10))%>%select(.,-ends_with(".2"))
   head(Data_extract)
   
   names(  Data_extract) <-(c('COUNTYFP10',paste0('DTW_', var_type),'year'))
@@ -133,12 +104,35 @@ IDW<-function(year, var_type){
   
   saveRDS(
     Data_extract, 
-    paste0('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/DTW/County/IDW_',var_type, year, ".rds")
+    paste0('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/DTW/County/IDW_',var_type, ".rds")
   )
   
   
   
 }
+
+
+
+future_lapply(
+  2000:2019,
+  function (x) IDW(x, "Fall")
+)
+
+
+
+
+future_lapply(
+  2000:2019,
+  function (x) IDW(x, "Spring")
+)
+
+
+future_lapply(
+  2000:2019,
+  function (x) Krige_county(x, "DTW")
+)
+
+
 
 IDW_append<-function(var_type){
   #append all the data
@@ -158,27 +152,6 @@ IDW_append<-function(var_type){
   unlink( DTW_panel, recursive = TRUE)
   
 }
-
-future_lapply(
-  1990:2019,
-  function (x) IDW(x, "Fall")
-)
-
-
-future_lapply(
-  "Fall",
-  function (x)IDW_append(x)
-)
-
-future_lapply(
-  1990:2019,
-  function (x) IDW(x, "Spring")
-)
-future_lapply(
-  "Spring",
-  function (x)IDW_append(x)
-)
-
 
 Fall<-readRDS('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/DTW/DTW_panel/Fall_DTW_panel.rds')
 Spring<-readRDS('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/DTW/DTW_panel/Spring_DTW_panel.rds')

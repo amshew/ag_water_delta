@@ -76,7 +76,7 @@ get_save_prism_y <- function(temp_start_year, var_type) {
     type = var_type,
     minDate = as.character(start_date),
     maxDate = as.character(end_date),
-    keepZip = FALSE)
+    keepZip = FALSE,check="internal")
   
  
 } 
