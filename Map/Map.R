@@ -119,7 +119,9 @@ crs(Delta_sd)
 #plot
 library(ggspatial)
 colnames(test_sf)[1]<-"value"
-DTW<-ggplot()+  geom_sf(data=test_sf, aes(color = value),size=0.02)+
+( DTW<-ggplot()+  
+  geom_sf(data=Delta_sd,fill="grey70", color=NA) +
+  geom_sf(data=test_sf, aes(color = value),size=0.02)+
   geom_sf(data=Delta_sd,fill=NA, color="grey50", size=1) +
   geom_sf(data=Delta_gp,fill=NA, color = "red", alpha = 5, linetype = 1, size=1)+
   geom_sf(data=Delta_cp,fill=NA, color = "blue", alpha = 5, linetype = 1, size=1)+
@@ -133,17 +135,20 @@ DTW<-ggplot()+  geom_sf(data=test_sf, aes(color = value),size=0.02)+
   theme(legend.title = element_text(size=10, face="italic"))+
   xlab("Longitude")+ ylab("Latitude")+theme(legend.justification = c(1, 0), 
                                             legend.position = c(1, 0))+
-   theme(legend.title.align=0.8) 
+  theme(legend.title.align=0.8)  )+ theme(axis.text = element_text(size=8))
 
 DTW
- 
+
 
 #bring in the data and plot the DTW for the fall on 2019
 
-Rice_freq<-readRDS("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Map/Rice_frequency.rds")
-crs(Rice_freq)
-Freq_rice<-aggregate(Rice_freq, fact=5) ### aggrgate resolution to 150m
+#Rice_freq<-readRDS("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Map/Rice_frequency.rds")
+
+#crs(Rice_freq)
+#Freq_rice<-aggregate(Rice_freq, fact=5) ### aggregate resolution to 150m
 memory.limit(size=20000000) 
+#saveRDS(Freq_rice, file="C:/Users/obemb/OneDrive/Desktop/data/Resources/manuscript/Map/Freq_rice.rds")
+Freq_rice<-readRDS("C:/Users/obemb/OneDrive/Desktop/data/Resources/manuscript/Map/Freq_rice.rds")
 rice_spdf <- as(Freq_rice, "SpatialPixelsDataFrame")
 plot(rice_spdf)
 crs(rice_spdf)
@@ -164,8 +169,11 @@ crs(rice_sf)
 library(cowplot)
 library(ggspatial)
 Rice<-ggplot()+
+  geom_sf(data=Delta_sd,fill="grey70", color=NA) +
   geom_sf(data=rice_sf, aes(color = layer),size=0.02)+
-  geom_sf(data=Delta_sd,fill=NA, color="grey50", size=0.5) +
+  geom_sf(data=Delta_sd,fill=NA, color="grey50", size=1) +
+  geom_sf(data=Delta_gp,fill=NA, color = "red", alpha = 5, linetype = 1, size=1)+
+  geom_sf(data=Delta_cp,fill=NA, color = "blue", alpha = 5, linetype = 1, size=1)+
   scale_color_distiller(palette = "Spectral",type = "seq", direction = -1,
                         name ="Rice cropping frequency")+
   annotation_scale(location = "bl", width_hint = 0.2,height = unit(0.15, "cm")) +
@@ -177,7 +185,7 @@ Rice<-ggplot()+
   theme(legend.title = element_text(size=10, face="italic"))+
   xlab("Longitude")+ ylab("Latitude")+theme(legend.justification = c(1, 0), 
                                             legend.position = c(1, 0))+
-  theme(legend.title.align=0.8) 
+  theme(legend.title.align=0.8) + theme(axis.text = element_text(size=8))
 
 Rice
 
@@ -234,20 +242,27 @@ ggplot(cost_region,aes(x=year,y=nos_practices,color=as.factor(region)))+
 
      
  ###rice share
-Rice<-readRDS("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Map/Rice.rds")
+Rice<-read.csv("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Map/Rice.csv")
+
 Rice$region <- factor(Rice$region,levels = c("Full CGA","Partial CGA","Non CGA"))
 Region<-c(a="Full CGA",b= "Partial CGA",c= "Non CGA")
-ggplot(Rice,aes( x=factor(Year) , y=Rotate,fill=type))  + 
-  geom_boxplot()+
-  facet_wrap(~region, ncol = 3, scales = "free")+
-  theme(panel.grid.minor.x = element_blank()) + 
-  # remove facet spacing on x-direction
-  theme(panel.spacing.x = unit(1,"line"))+
-  theme(strip.placement = 'outside',
-        strip.background.x = element_blank())+
-  labs(x = "Year", y =  "Share of rice (t-1) in rice (t) or soyabean(t)")+scale_y_continuous(breaks = seq(0,1,0.1),limits=c(0,1))+ 
-  scale_fill_manual(values = c("#006D2C", "#0868AC"),name=" Rotation",  breaks=c("R_S", "R_R"),
-                    labels=c("Rice-soybeans", "Rice-rice"))
-
+( cga_croprotations <- ggplot(Rice,aes( x=factor(Year) , y=Rotate,fill=type))  +
+    geom_boxplot()+
+    facet_wrap(~region, ncol = 3, scales = "free")+
+    theme(panel.grid.minor.x = element_blank()) +
+    # remove facet spacing on x-direction
+    theme(panel.spacing.x = unit(1,"line"))+
+    theme(strip.placement = 'outside',
+          strip.background.x = element_blank())+
+    labs(x = "Year", y =  "Share of rice (t-1) in rice (t) or soybean(t)", size = 10) +
+    scale_y_continuous(breaks = seq(0,1,0.1), limits=c(0,1)) +
+    scale_x_discrete(breaks=seq(2009, 2019, 2))+
+    scale_fill_manual(values = c("#006D2C", "#0868AC"), name= element_blank(),
+                      breaks=c("R_S", "R_R"), labels=c("Rice-soybeans", "Rice-rice")) +
+    theme(axis.text = element_text(size=8), axis.text.x = element_text(angle = 45, hjust = 1),
+          legend.position = c(0.5, 0.92), legend.background = element_rect(fill="transparent"))
+)
+ggsave(filename = "cga_croprotations.png", plot = cga_croprotations,
+       device = "png", height = 4.75, width = 6.5 , units = "in", dpi = 500)
 
 

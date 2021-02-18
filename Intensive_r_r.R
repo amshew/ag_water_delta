@@ -31,7 +31,7 @@ library(cdlTools)
 library(prism)
 library(rgdal)
 library(raster)
-setwd("C:/Users/obemb/OneDrive/Documents")
+#setwd("C:/Users/obemb/OneDrive/Documents")
 
 
 list.files()

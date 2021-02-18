@@ -198,6 +198,7 @@ future_lapply(
 )
 
 #append all the data
+unlink( 'C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/County/share_crop_panel_county.rds', recursive = TRUE)
 share_crop<-"C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/County"
 share_crop_panel<-list.files(share_crop,
                              full.names = T,
@@ -210,7 +211,7 @@ saveRDS(
   file='C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/County/share_crop_panel_county.rds')
 
 
-
+#####share of different crops calculated.1 represent corn, 2-cotton, 3-rice,4-Sorghum and 5-Soybean
 subset_crop<-function(d){
   folder_name <- paste0("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/County") 
   print(folder_name)

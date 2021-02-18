@@ -113,7 +113,7 @@ get_save_prism_y <- function(temp_start_year, var_type) {
   file_path <- paste0('C:/Users/obemb/OneDrive/Documents/prismtmp/', folder_name, "/", file_name)
   file_path
   
-  #--- combine all the PRISM files as a RasterStack ---#
+  #--- combine all the PRISM files as a RasterStack and extract information for counties in the AR Delta ---#
   temp_stars <- stack(file_path) %>% 
     #--- crop to AR ---#
     crop(., extent(AR.Delta)) %>% 
@@ -198,4 +198,4 @@ saveRDS(coord, file = 'C:/Users/obemb/OneDrive/Documents/prismtmp/Weather Data/c
 plot(coord$longitude,coord$latitude)
 
 
-abab<-readRDS("C:/Users/obemb/OneDrive/Documents/prismtmp/Weather Data/County/PRISM_tmin_y2009.rds")
+#abab<-readRDS("C:/Users/obemb/OneDrive/Documents/prismtmp/Weather Data/County/PRISM_tmin_y2009.rds")

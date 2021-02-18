@@ -29,13 +29,13 @@ library(plm)
 library(lmtest)
 library(sandwich)
 
-Rice_freq<-  readRDS('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/lu_panel_county_mon.rds')%>%
+Crop_Rotation<-  readRDS('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/lu_panel_county_mon.rds')%>%
   subset( ., select = -c(County,Crop_Acre))
-Rice_freq$COUNTYFP10<- as.numeric(as.character(Rice_freq$COUNTYFP10))
+Crop_Rotation$COUNTYFP10<- as.numeric(as.character(Crop_Rotation$COUNTYFP10))
 Data_freq<- read.csv("C:/Users/obemb/OneDrive/Desktop/data/Code/STATA/prices/Data_county_freq.csv")
 Data_exp<- read.csv("C:/Users/obemb/OneDrive/Desktop/data/Code/STATA/prices/Data_county.csv")
 
-Data<- merge(Data_exp,Rice_freq,by=c("Year","COUNTYFP10","ID"),all.x=TRUE)%>%
+Data<- merge(Data_exp,Crop_Rotation,by=c("Year","COUNTYFP10","ID"),all.x=TRUE)%>%
   subset( ., select = c(share,share_freq, Total,soybean_return_fut,rice_return_fut,Clay,ppt,mean_sT,Year,fips,county))
 summary(Data)
 Data<-Data%>%mutate(.,logTotal=log(Total))

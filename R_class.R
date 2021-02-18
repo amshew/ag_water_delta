@@ -18,30 +18,28 @@ pacman::p_load(
   raster,
   cdltools,
   maptools,
-  parallel
+  parallel,
+  foreach
   )   
-  library(pacman)
+
 setwd("C:/Users/obemb/OneDrive/Documents")
 options(prism.path = '~/prismtmp')
 
 #A.
-temp_start_month <- 01
-temp_end_month <- 01
-#--- year to work on ---#  
-temp_start_year <- 2019
 
-temp_end_year <- 2019
+#get shapefile for Arkansas
+AR<-getData('GADM', country='USA', level=2)%>%subset(.,NAME_1=="Arkansas")
+plot(AR)
+
 #--- month to work on ---#  
 temp_start_month <- 07
 temp_end_month <-07
 #--- year to work on ---#  
 temp_start_year=2019
-#get shapefile for Arkansas
-AR<-getData('GADM', country='USA', level=2)%>%subset(.,NAME_1=="Arkansas")
-plot(AR)
+temp_end_year=2019
 start.time <- Sys.time()
 num_cores <- detectCores() 
-
+var_type="ppt"
 plan(multiprocess, workers = num_cores)
 get_save_prism_y <- function(temp_start_year, var_type) {
   
@@ -97,13 +95,13 @@ future_lapply(
  2019:2019,
   function (x) get_save_prism_y(x, "ppt")
 )
-#Download ppt in tmin
+#Download  tmin
 future_lapply(
   2019:2019,
   function (x) get_save_prism_y(x, "tmin")
 )
 
-#Download ppt in tmax
+#Download  tmax
 future_lapply(
   2019:2019,
   function (x) get_save_prism_y(x, "tmax")
@@ -114,7 +112,12 @@ future_lapply(
 Data_ppt<-readRDS('C:/Users/obemb/OneDrive/Documents/prismtmp/PRISM_ppt_y2019.rds')
 #Plot precipitation for USA
 Data_USA <- Data_ppt%>% 
-  calc(.,sum) %>% plot()
+  calc(.,sum) %>% plot(.,
+                       legend = T,
+                       axes = FALSE,
+                       box = FALSE,
+                       main = "Total amount of precipitation received mm",
+                       cex.main=0.85, adj = 0., line=-0.5)
 
 #--- crop and plot data for Arkansas ---#
 Data_AR_ppt <-Data_ppt%>%  crop(., extent(AR))%>%
@@ -148,10 +151,9 @@ saveRDS(
 
 
 ###Degree days and temperature bins
-Data_tmin<-readRDS('C:/Users/obemb/OneDrive/Documents/prismtmp/PRISM_tmin_y2019.rds')
-Data_tmax<-readRDS('C:/Users/obemb/OneDrive/Documents/prismtmp/PRISM_tmax_y2019.rds')
+
 var_type="tmax"
-Degree_days<-function(var_type,year){
+Degree_days<-function(var_type){
   Data<-readRDS(paste0('C:/Users/obemb/OneDrive/Documents/prismtmp/PRISM_', var_type, "_y", temp_start_year, ".rds"))
 temp_stars<-Data%>% 
   #--- crop to AR ---#
@@ -188,54 +190,71 @@ Degree_days("tmin")
 tmin<-readRDS('C:/Users/obemb/OneDrive/Documents/prismtmp/PRISM_tmin_y.rds')
 tmax<-readRDS("C:/Users/obemb/OneDrive/Documents/prismtmp/PRISM_tmax_y.rds")
 weather<-merge(tmax,tmin)
-
+prec<-readRDS('C:/Users/obemb/OneDrive/Documents/prismtmp/PRISM_ppt.rds')
+weather<-  merge(weather,prec)
+write.csv(weather,file='C:/Users/obemb/OneDrive/Documents/prismtmp/PRISM_weather.csv')
 weather$tavg=(weather$tmax+weather$tmin)/2
 ggplot(data = weather, 
        aes(x = date, y = tavg,group=date)) +
   geom_boxplot() +
   xlab("Day") +
   ylab("Average Temperature") 
-#create label for negative bounds by adding Minus;
 
-result <- foreach(b=0:35,  .combine=cbind) %do%{
+#we are going to construct degree days and temperature bin based on different bounds
+#Exposure:the number of hours per day a crop spend withing at a certain temperature
+# Bins: is the temperature range
+b=32
+result <- foreach(b=32:35,  .combine=cbind) %do%{
   c<-b
   h<-b+1
   e<-abs(h)
   d<-abs(c)
   f<-ifelse(c < 0,paste0("minus",sep = "",d),c)
+  #  default case 1: tMax <= bound
   weather[,paste0("dday",f,"C", sep="")] <-0
   weather[,paste0("time",f,"C", sep="")] <-0
   case_dd<- weather$tavg - b
   # case 2: bound <= tMin
   weather[,paste0("dday",f,"C", sep="")] <- ifelse( b <=  weather$tmin, case_dd , 0)
-  weather$tempSave = acos( (2*b-weather$tmax-weather$tmin)/(weather$tmax-weather$tmin) )
+ 
   weather[,paste0("time",f,"C", sep="")] <-ifelse( b<=  weather$tmin,1, 0)
-  weather[,paste0("dday",f,"C", sep="")] <-ifelse (weather$tmin < b & b <  weather$tmax,((  weather$tavg-b)* weather$tempSave + ( weather$tmax- weather$tmin)*sin( weather$tempSave)/2)/pi, weather$tavg - b)
-  weather[,paste0("time",f,"C", sep="")] <-ifelse ( weather$tmin< b & b <  weather$tmax,(acos( (2*b-weather$tmax-weather$tmin)/(weather$tmax-weather$tmin) )/pi), 1)
-  
+  #case 3: tMin < bound < tMax
+  weather$tempSave = acos( (2*b-weather$tmax-weather$tmin)/(weather$tmax-weather$tmin) )
+  weather$tempSave[is.nan(weather$tempSave)] <- 0
+  weather[,paste0("dday",f,"C", sep="")] <-ifelse (weather$tmin < b & b <  weather$tmax,((  weather$tavg-b)* weather$tempSave + ( weather$tmax- weather$tmin)*sin( weather$tempSave)/2)/pi, 0)
+  weather[,paste0("time",f,"C", sep="")] <-ifelse ( weather$tmin< b & b <  weather$tmax,(acos( (2*b-weather$tmax-weather$tmin)/(weather$tmax-weather$tmin) )/pi), 0)
+
   
   weather= subset( weather, select = -c(tempSave) ) }
 
-#Calculate the temperature bins
-b=0:34
+#Calculate the temperature exposure
+b=20:33
 for(i in b){
   c<-b
   h<-b+1
-  e<-abs(h)
-  d<-abs(c)
-  f<-ifelse(c < 0,paste0("minus",sep = "",d),c)
-  
-  weather[,paste0("bin",f,"_",e,sep="")]<-weather[,paste0("time",f,"C", sep="")]-weather[,paste0("time",e,"C", sep="")]
+
+    weather[,paste0("exp",c,"C",sep="")]<-weather[,paste0("time",c,"C", sep="")]-weather[,paste0("time",h,"C", sep="")]
+    
 }
 weather= select(weather,-starts_with("time"))
 
+colnames(weather)
+library(dplyr)
+#generate temperature bin
+b=21
+b=20:30
+for(i in seq(from =20, to = 30, by = 3)){
+  print(i)
+  c<-i
+  h<-i+1
+  k=i+2
 
-end.time <- Sys.time()
-time.taken <- end.time - start.time
-time.taken
+  weather[,paste0("bin",c,"_",k,sep="")]<- weather[,paste0("exp",c,"C", sep="")]+weather[,paste0("exp",h,"C", sep="")]+weather[,paste0("exp",k,"C", sep="")]
+}
 
+weather= select(weather,-starts_with("exp"))
 
-#regresion
+#regression
 
 ab<- data.frame(AR@plotOrder, AR@data[["NAME_2"]])%>%as.data.frame()
 colnames(ab)[1]<- "ID"
@@ -261,3 +280,7 @@ library(lmtest)
 library(sandwich)
 linearMod <- lm(Yield ~ poly(ppt, 2, raw = TRUE)+dd8_32C+dd32C,data=Data)
 summary(linearMod)
+
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+time.taken

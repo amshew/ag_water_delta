@@ -59,7 +59,7 @@ head(Return)
 Return=Return[Return$Year >= "2006" &Return$Year<= "2019",]
 colnames(Return)
 #cost and acreage
-cost_share<-readRDS('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/IWM/IWM_cost_county_subsidy_bundle.rds')
+cost_share<-readRDS('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/IWM/IWM_cost_county.rds')
 
 
 Rice_acreageshare<-  readRDS('C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Output/Crop_share/County/CDL/CDL_3_.rds')%>%

@@ -101,12 +101,12 @@ extent(AR_Mask)
 show(AR_Mask)
 show(soil_Delta)
 #resampling using the nearest neighbor from 10-(soil_Delta) to 30-(nlcd) using nearest neighbor
-
-#r.new = resample(soil_Delta ,AR_Mask ,method= 'ngb')
-#writeRaster(r.new, paste0("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/r.new_county", ".tif"),  overwrite = T)
-#show(r.new)
-
-r.new<-raster("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/r.new.tif") #saving the raster saves time.
+#saving the raster saves time when resampling is needed to be done.
+r.new = resample(soil_Delta ,AR_Mask ,method= 'ngb')
+writeRaster(r.new, paste0("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/r.new_county", ".tif"),  overwrite = T)
+show(r.new)
+#saving the raster saves time when resampling is needed to be done.
+r.new<-raster("C:/Users/obemb/OneDrive/Documents/R/ag_water_delta/Data/r.new.tif") 
 soil<- mask(r.new, AR_Mask, maskvalue = FALSE)
 show(soil)
 crs(soil)
@@ -124,16 +124,16 @@ colnames(Soil_df)[2] <- "count"
 Soil_df_weigt<-Soil_df%>%group_by(ID, mukey)%>%summarise(count= n())%>%group_by(ID)%>%
   within(., {sum = ave(count,ID,FUN=sum)} )%>%mutate( .,weight=count/sum)%>%
   subset( ., select = -c(count,sum))
-gssurgo_value<-read.csv("F:/transfer/Soil_code/statsgo/gssurgo_value.csv")
-#statsgo
-statsgo_value<-read.csv("F:/transfer/Soil_code/statsgo/mapunit_soils_data_needed.csv")
+###merge with gssurgo data
+gssurgo_value<-read.csv("E:/transfer/Soil_code/statsgo/gssurgo_value.csv")
+###merge with statsgo
+statsgo_value<-read.csv("E:/transfer/Soil_code/statsgo/mapunit_soils_data_needed.csv")
 
 soil_value<-full_join( gssurgo_value, statsgo_value, by=c("mukey"),sort = TRUE)
 
 soil_all<-full_join(Soil_df_weigt, soil_value, by=c("mukey"),sort = TRUE)
 soil_all[is.na(soil_all)] <- 0
-#reweighting the soil attributes based on weight and summarizong to HUC 12
-
+#reweighting the soil attributes based on weight and summarizing to county
 Soil_data<-soil_all%>%mutate(across(4:93,~ . *weight))%>% group_by(ID) %>%
   summarise_each(funs(sum)) %>%
   subset( ., select = -c(mukey,objectid))
