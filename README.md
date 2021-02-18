@@ -1,9 +1,10 @@
 # ag_water_delta
 
-This initial repo hosts code for the Arkansas Groundwater Initiative project. We're mapping groundwater and estimating models to investigate the impacts of conservation.
+This initial repo hosts code for the Arkansas Groundwater Initiative project. We're mapping groundwater and estimating models to investigate the impacts of conservation practices.
 
 ######***Data download and wrangling
-######**Weather related data dependen on Prism.
+
+######**Weather related data dependend on Prism.
 #* Prism_data_county
 This code downloads the weather information (precipitation, minimum and maximum temperature) 
 from PRISM and extract information for counties in the AR Delta. Line 186-199 obtains the centroid for AR Delta.
@@ -17,10 +18,9 @@ This code calculates the daily degree days (-10 to 39 degree celcius) and temper
 The data generated consist date, countyname, countyfp10,latitude, longitude, tavg, ppt, min temp, max temp, degree days and bins.
 
 #* ET_VPD_county
- This code is executed once the Prism_data_county is completed. This code calculates Penman evapotransipiration and vapor pressure density. The elevation used in the estimation of ET is obtain from SSURGO.
+ This code is executed once the Prism_data_county is completed. This code calculates Penman evapotranspiration and vapor pressure density. The elevation used in the estimation of ET is obtain from SSURGO.
 
 ######*****Nass related data- Cropland layer Data.
-
 I used the code below to download the CDL layers. 
 ######Download CDL*******************#
 
@@ -39,17 +39,19 @@ This code generates the share of major crops, crop acres, and the total cropland
 This code calculates the share of rice that is rotated within each county of the AR Delta. This majority of the process explained above in the acreage_share_county code plus classification, overlay of rasters and extraction of information. The first step involves cropping, masking and reclassification. The second step involves the use of overlay function in raster to determine if there is a change in the rasters.
 #* outcome
 This code generated the share of rice within each county.
+
 ######*****Soil data from gSSURGO and SSurgo
 This code extracts county soil variables from gSSURGO and SSurgo. We used the NLCD 2016 to mask noncropland areas. It involves the resampling of soil raster from 10-(soil_Delta) to 30-(nlcd) using nearest neighbor using the nearest neighbor. The Statgo and SSurgo csv files, and the STATA code used in creating some of these variables can be provided upon request.
 #* outcome
 Soil data
+
 ######*****Cost Share
 #*Iwm_costshare_county_updated
 This code calculated the total cost share by county. There second portion of the code is not to be ran.
 #* outcome
 Total cost share of all practices related to IWM per county in the AR Delta
-######*****Cropland return
 
+######*****Cropland return
 The estimation was done in Stata. Code and data can be provided upon request.
 
 ######*****Average saturated thickness
@@ -58,13 +60,13 @@ This code extracts and calculate the county average saturated thickness from Tor
 
 ######*****Merging of data
 #*Costshare_merged_data
-This code brings all the outcome together. Once the data are merged together, we can use the data for estimation. 
+This code brings all the outcome data together. Once the data are merged, we can use them for estimation. 
 Table 3 is also created by running a line of code in line 110.
 
 ######*****Figure
 #*r_s_intensification_fiqure
 This code calculates the share of rice and soybean between 2010-2019 that is rotated within each county of the AR Delta. This majority of the process explained above in the acreage_share_county code plus classification, overlay of rasters and extraction of information. The first step involves cropping, masking and reclassification. The second step involves the extraction of rice and soybeans within each county and the share of rice or soybean rotated.
-The third portion of the code produces figure 2 in the manuscript
+The third portion of the code produces figure 2 in the manuscript.
 
 #***Map
 This folder consist of data and code used in producing the maps in the manuscript.
